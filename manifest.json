@@ -1,6 +1,7 @@
 {
     "name": "Cookies Dashboard",
     "version": "1.0.0",
+    "permissions": ["cookies"],
     "description": " This is an extension for cookies",
     "manifest_version": 3,
     "author": "Daniela Sanchez",
