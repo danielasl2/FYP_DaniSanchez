@@ -3,10 +3,7 @@
     "version": "1.0.0",
     "description": " This is an extension for cookies",
     "manifest_version": 3,
-    "permissions": [
-        "cookies",
-        "https://https://www.youtube.com/"
-      ],
+    "permissions": ["cookies"],
     "author": "Daniela Sanchez",
     "action":{
         "default_popup": "index.html",
