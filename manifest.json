@@ -1,11 +1,11 @@
 {
-    "name": "Cookies Dashboard!!!",
+    "name": "Cookies Dashboard",
     "version": "1.0.0",
     "description": " This is an extension for cookies",
     "manifest_version": 3,
     "permissions": ["cookies"],
     "author": "Daniela Sanchez",
-    "browser_action":{
+    "action":{
         "default_popup": "index.html",
         "default_title": "Cookies Dashboard"
     }
