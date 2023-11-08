@@ -1,0 +1,21 @@
+{
+    "name": "Cookies Dashboard",
+    "version": "1.0.0",
+    "description": " This is an extension for cookies",
+    "manifest_version": 3,
+    "background": { 
+        "service_worker": "background.js"
+ },
+    "permissions": ["cookies"],
+    "host_permissions":[
+        "http://*/*", "https://*/*", "<all_urls>"],
+    "author": "Daniela Sanchez",
+    "action":{
+        "default_popup": "dist/index.html",
+        "default_title": "Cookies Dashboard"
+    },
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }]
+}
