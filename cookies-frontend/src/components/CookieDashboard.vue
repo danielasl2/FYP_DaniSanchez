@@ -1,13 +1,14 @@
 <template>
-    <div>
-        <h1>Cookies</h1>
+  <div>
+    <h1>Cookies</h1>
     <ul>
       <li v-for="cookie in cookies" :key="cookie.name">
         {{ cookie.name }}: {{ cookie.value }}
       </li>
     </ul>
-    </div>
+  </div>
 </template>
+
 <script>
 export default {
   data() {
@@ -16,13 +17,16 @@ export default {
     };
   },
   methods: {
-     updateCookies(newCookies) {
-      this.cookies = newCookies; 
+    getCookies() {
+      chrome.runtime.sendMessage({ action: "getCookies" }, (response) => {
+        if (response && response.cookies) {
+          this.cookies = response.cookies;
+        }
+      });
     }
-  
   },
   created() {
-    this.getCookies(); 
+    this.getCookies();
   }
 };
 </script>
