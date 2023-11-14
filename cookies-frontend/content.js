@@ -1,13 +1,7 @@
-let cookies = document.cookie;
-
-chrome.runtime.sendMessage({action: "getCookies", data: {url: window.location.href}}, function(response) {
-
-  if (response.cookies) {
-
+chrome.runtime.sendMessage({ action: "getCookies", data: { url: window.location.href }}, function(response) {
+  if (response && response.cookies) {
     console.log("Cookies:", response.cookies);
+  } else if (response && response.error) {
+    console.error("Error:", response.error);
   }
 });
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === "displayCookies") {
-    }
-  });
