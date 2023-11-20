@@ -3,6 +3,7 @@
     <h1>Cookies</h1>
     <div v-for="(cookies, domain) in groupingCookies" :key="domain">
       <h2> {{domain}}</h2>
+      <a v-b-toggle href="#example-collapse" @click.prevent>{{domain}} &rsaquo;</a>
       <b-table striped hover :items="cookiesGrid(cookies)"></b-table>
       <!--
     <ul>
