@@ -1,4 +1,5 @@
-import { createApp } from 'vue'
-import CookieDashboard from './components/CookieDashboard.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
 
-createApp(CookieDashboard).mount('#app')
+const app = createApp(App);
+app.mount('#app');

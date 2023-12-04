@@ -1,11 +1,15 @@
 <template>
   <div>
     <h1>Cookies!!!!!</h1>
-    <ul>
-      <li v-for="cookie in cookies" :key="cookie.name">
-        {{ cookie.name }}: {{ cookie.value }}
-      </li>
-    </ul>
+    <b-row>
+    <b-col v-for="cookie in cookies" :key="cookie.name" cols="12" md="4">
+      <div class="cookie">
+        <p> Domain:</p> {{cookie.domain}}
+        <p> Name:</p> {{cookie.name}}
+        <p> Expiration Date</p> {{cookie.expirationDate}}
+      </div>
+    </b-col>
+  </b-row>
   </div>
 </template>
 
