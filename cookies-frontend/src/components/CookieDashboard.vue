@@ -1,11 +1,20 @@
 <template>
   <div>
-    <h1>Cookies!!!!!</h1>
+    <h1>Cookies</h1>
+    <div v-for="(cookies, domain) in groupingCookies" :key="domain">
+      <h2> {{domain}}</h2>
+      <a v-b-toggle href="#example-collapse" @click.prevent>{{domain}} &rsaquo;</a>
+      <b-table striped hover :items="cookiesGrid(cookies)"></b-table>
+      <!--
     <ul>
       <li v-for="cookie in cookies" :key="cookie.name">
-        {{ cookie.name }}: {{ cookie.value }}
+          <p>Name: </p> {{cookie.name}},
+          <p>Path: </p> {{cookie.path}},
+          <p>Secure: </p> {{cookie.secure}}
       </li>
     </ul>
+    -->
+    </div>
   </div>
 </template>
 
@@ -25,13 +34,32 @@ export default {
           this.cookies = cookies;
         }
       });
+    },
+   cookiesGrid(cookies){
+      return cookies.map(cookie => ({
+        name: cookie.name,
+        path: cookie.path,
+        secure: cookie.secure
+      }));
+    }
+  },
+  //Cookies are being grouped into their domains
+  computed: {
+    groupingCookies(){
+      const grouping ={};
+      this.cookies.forEach(cookie => {
+        if(!grouping[cookie.domain]){
+          grouping[cookie.domain] = [];
+        }
+        grouping[cookie.domain].push(cookie);
+      });
+      return grouping;
     }
   },
   mounted() {
     if (chrome && chrome.tabs && chrome.tabs.query) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (chrome.runtime.lastError) {
-          // Handle any errors that occur during the query
           console.error('Error querying tabs:', chrome.runtime.lastError);
           return;
         }
@@ -42,7 +70,7 @@ export default {
     } else {
       console.error('chrome.tabs is not available');
     }
-  }
+  },
 };
 
 
