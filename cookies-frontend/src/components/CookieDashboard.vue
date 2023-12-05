@@ -30,17 +30,23 @@ export default {
       });
     },
     categorisedCookie(cookie){
+      let category = '';
       if(!cookie.expirationDate){
-        return 'Session';
-      } else if (cookie.expirationDate){
-        return 'Persistent';
-      } else if (cookie.secure){
-        return 'Secure';
-      } else if ( cookie.domain === this.currentDomain){
-        return 'First-Party';
+        category += ' Session';
       } else {
-        return 'Third-Party';
+        category += ' Persistent';
+      } 
+      if (cookie.secure){
+        category += ' Secure';
+      } 
+      const cookieDomain = cookie.domain.startsWith('.') ? cookie.domain.substring(1): cookie.domain;
+      const pageDomain = this.currentDomain.startsWith('.') ? this.currentDomain.substring(1) : this.currentDomain;
+      if (pageDomain.endsWith (cookieDomain)){
+        category += ' First-Party';
+      } else {
+        category += ' Third-Party';
       }
+      return category;
     },
     getCurrentDomain(){
       return new Promise((resolve, reject) =>[
@@ -92,6 +98,7 @@ export default {
     this.getAllCookies();
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;
+      console.log("Current Domain: ", this.currentDomain);
     }).catch(error =>{
       console.error('Error', error);
     })
