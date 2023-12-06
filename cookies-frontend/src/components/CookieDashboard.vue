@@ -29,6 +29,17 @@ export default {
         }
       });
     },
+    identifyThirdPartyCookies(cookie){
+      if (cookie.domain.includes ('ad') || cookie.name.includes('ad')){
+        return 'Advertising';
+      } else if (cookie.domain.includes('analytic') || cookie.name.includes('analytic')){
+        return 'Analytics';
+      } else if (cookie.domain.includes('social') || cookie.name.includes('social')){
+        return 'Social Media';
+      } else {
+        return 'Other';
+      }
+    },
     categorisedCookie(cookie){
       let category = '';
       if(!cookie.expirationDate){
@@ -44,7 +55,7 @@ export default {
       if (pageDomain.endsWith (cookieDomain)){
         category += ' First-Party';
       } else {
-        category += ' Third-Party';
+      category += `, Third-Party - ${this.identifyThirdPartyCookies(cookie)}`;
       }
       return category;
     },
