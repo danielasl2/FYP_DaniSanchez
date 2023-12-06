@@ -44,7 +44,17 @@ export default {
         }
       });
     },
-
+    identifyThirdPartyCookies(cookie){
+      if (cookie.domain.includes ('ad') || cookie.name.includes('ad')){
+        return 'Advertising';
+      } else if (cookie.domain.includes('analytic') || cookie.name.includes('analytic')){
+        return 'Analytics';
+      } else if (cookie.domain.includes('social') || cookie.name.includes('social')){
+        return 'Social Media';
+      } else {
+        return 'Other';
+      }
+    },
     categorisedCookie(cookie){
       let category = '';
       if(!cookie.expirationDate){
@@ -60,7 +70,7 @@ export default {
       if (pageDomain.endsWith (cookieDomain)){
         category += ' First-Party';
       } else {
-        category += ' Third-Party';
+      category += `, Third-Party - ${this.identifyThirdPartyCookies(cookie)}`;
       }
       return category;
     },
@@ -118,44 +128,14 @@ export default {
     }).catch(error =>{
       console.error('Error', error);
     })
-  }
-  }
+  },
    cookiesGrid(cookies){
       return cookies.map(cookie => ({
         name: cookie.name,
         path: cookie.path,
-        secure: cookie.secure
+        secure: cookie.secure,
       }));
-    }
-  },
-  //Cookies are being grouped into their domains
-  computed: {
-    groupingCookies(){
-      const grouping ={};
-      this.cookies.forEach(cookie => {
-        if(!grouping[cookie.domain]){
-          grouping[cookie.domain] = [];
-        }
-        grouping[cookie.domain].push(cookie);
-      });
-      return grouping;
-    }
-  },
-  mounted() {
-    if (chrome && chrome.tabs && chrome.tabs.query) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (chrome.runtime.lastError) {
-          console.error('Error querying tabs:', chrome.runtime.lastError);
-          return;
-        }
-        if (tabs[0] && tabs[0].url) {
-          this.getCookies(tabs[0].url);
-        }
-      });
-    } else {
-      console.error('chrome.tabs is not available');
-    }
-  },
+    },
 };
 
 
