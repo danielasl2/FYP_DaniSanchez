@@ -128,44 +128,14 @@ export default {
     }).catch(error =>{
       console.error('Error', error);
     })
-  }
-  }
+  },
    cookiesGrid(cookies){
       return cookies.map(cookie => ({
         name: cookie.name,
         path: cookie.path,
-        secure: cookie.secure
+        secure: cookie.secure,
       }));
-    }
-  },
-  //Cookies are being grouped into their domains
-  computed: {
-    groupingCookies(){
-      const grouping ={};
-      this.cookies.forEach(cookie => {
-        if(!grouping[cookie.domain]){
-          grouping[cookie.domain] = [];
-        }
-        grouping[cookie.domain].push(cookie);
-      });
-      return grouping;
-    }
-  },
-  mounted() {
-    if (chrome && chrome.tabs && chrome.tabs.query) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (chrome.runtime.lastError) {
-          console.error('Error querying tabs:', chrome.runtime.lastError);
-          return;
-        }
-        if (tabs[0] && tabs[0].url) {
-          this.getCookies(tabs[0].url);
-        }
-      });
-    } else {
-      console.error('chrome.tabs is not available');
-    }
-  },
+    },
 };
 
 
