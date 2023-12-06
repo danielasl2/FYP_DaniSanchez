@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1>Cookies!!!!!</h1>
+       <b-table :items="formattedCookies" :fields="fields"></b-table>
     <h1>Cookies</h1>
     <div v-for="(cookies, domain) in groupingCookies" :key="domain">
       <h2> {{domain}}</h2>
@@ -22,12 +24,19 @@
 export default {
   data() {
     return {
-      cookies: []
+      cookies: [],
+      currentDomain: null,
+       fields: [
+        { key: 'domain', label: 'Website' },
+        { key: 'name', label: 'Cookie Name' },
+        { key: 'expirationDate', label: 'Expiration Date' },
+        { key: 'type', label: 'Category'}
+      ]
     };
   },
   methods: {
-    getCookies(url) {
-      chrome.cookies.getAll({ url: url }, (cookies) => {
+    getAllCookies() {
+      chrome.cookies.getAll({}, (cookies) => {
         if (chrome.runtime.lastError) {
           console.error('Error:', chrome.runtime.lastError);
         } else {
@@ -35,6 +44,82 @@ export default {
         }
       });
     },
+
+    categorisedCookie(cookie){
+      let category = '';
+      if(!cookie.expirationDate){
+        category += ' Session';
+      } else {
+        category += ' Persistent';
+      } 
+      if (cookie.secure){
+        category += ' Secure';
+      } 
+      const cookieDomain = cookie.domain.startsWith('.') ? cookie.domain.substring(1): cookie.domain;
+      const pageDomain = this.currentDomain.startsWith('.') ? this.currentDomain.substring(1) : this.currentDomain;
+      if (pageDomain.endsWith (cookieDomain)){
+        category += ' First-Party';
+      } else {
+        category += ' Third-Party';
+      }
+      return category;
+    },
+    getCurrentDomain(){
+      return new Promise((resolve, reject) =>[
+        chrome.tabs.query({active:true, currentWindow: true}, (tabs) => {
+          if (chrome.runtime.lastError){
+            reject(chrome.runtime.lastError);
+          }else if (tabs[0] && tabs[0].url){
+            const url = new URL (tabs[0].url);
+            const domain = url.hostname;
+            resolve(domain);
+          }else {
+            resolve (null);
+          }
+        })
+      ])
+    },
+    formatExpirationDate(timestamp) {
+      if (!timestamp) return 'N/A';
+      const date = new Date(timestamp * 1000);
+      return date.toLocaleDateString(); 
+    }, 
+  },
+  computed: {
+    formattedCookies() {
+      return this.cookies.map(cookie => ({
+        ...cookie,
+        expirationDate: this.formatExpirationDate(cookie.expirationDate),
+        type: this.categorisedCookie(cookie)
+      }));
+    },
+    sessionCookies() {
+      return this.cookie.filter(cookie => !cookie.expirationDate);
+    },
+    persistentCookies(){
+      return this.cookies.filter(cookie => cookie.expirationDate);
+    },
+    firstPartyCookies() {
+     // const currentDomain = this.getCurrentDomain();
+      return this.cookies.filter(cookie => cookie.domain === this.currentDomain);
+    },
+    thirdPartyCookies(){
+      return this.cookies.filter(cookie => cookie.domain != this.currentDomain);
+    },
+    secureCookies(){
+      return this.cookies.filter(cookie => cookie.secure);
+    }
+  },
+  mounted() {
+    this.getAllCookies();
+    this.getCurrentDomain().then(domain => {
+      this.currentDomain = domain;
+      console.log("Current Domain: ", this.currentDomain);
+    }).catch(error =>{
+      console.error('Error', error);
+    })
+  }
+  }
    cookiesGrid(cookies){
       return cookies.map(cookie => ({
         name: cookie.name,
