@@ -6,11 +6,12 @@
     <b-list-group-item button @click="toggleCollapse('persistent')">
       Persistent Cookies ({{persistentCookies.length}})
     </b-list-group-item>
-    <b-collapse id="collapse-persistent">
-      <b-card>
-      <b-table :items="persistentCookies" :fields="cookieFields"></b-table>
-      </b-card>
-    </b-collapse>
+    <b-collapse v-for="(cookies, category) in visibleCategories" :key="'collapse-' + category" :id="'collapse-' + category">
+  <b-card>
+    <b-table :items="cookies" :fields="cookieFields"></b-table>
+  </b-card>
+</b-collapse>
+
 
     <!--Secure Cookies -->
     <b-list-group-item button @click="toggleCollapse('secure')">
@@ -102,7 +103,7 @@ export default {
   data() {
     return {
       cookies: [],
-      showPersistent: false,
+      showGrid: {},
       currentDomain: null,
        cookieFields: [
         { key: 'domain', label: 'Website' },
@@ -130,7 +131,7 @@ export default {
       }))
     },
     toggleCollapse(category){
-      this.$root.$emit('bv::toggle::collapse', 'collapse-' + category);
+      this.$set(this.showGrid, category, !this.showGrid[category]);
       },
     identifyThirdPartyCookies(cookie){
       if (cookie.domain.includes ('ad') || cookie.name.includes('ad')){
@@ -196,6 +197,11 @@ export default {
     },
   },
   computed: {
+    visibleCategories(){
+      return Object.entries(this.categorisedCookies).filter(
+        ([category]) => this.showGrid[category]
+      );
+    },
     categorisedCookies(){
       let categories = {};
       for (let cookie of this.cookies){
@@ -257,6 +263,12 @@ export default {
       console.error('Error', error);
     })
   },
+  /* to show the grid under each category */
+  created(){
+    this.categorisedCookies.forEach((_, category) => {
+    this.$set(this.showGrid, category, false);
+  });
+  }
 };
 
 
