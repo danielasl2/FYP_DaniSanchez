@@ -1,22 +1,47 @@
 <template>
   <div>
     <h1>Cookies!!!!!</h1>
-       <b-table :items="formattedCookies" :fields="fields"></b-table>
-    <h1>Cookies</h1>
-    <div v-for="(cookies, domain) in groupingCookies" :key="domain">
-      <h2> {{domain}}</h2>
-      <a v-b-toggle href="#example-collapse" @click.prevent>{{domain}} &rsaquo;</a>
-      <b-table striped hover :items="cookiesGrid(cookies)"></b-table>
-      <!--
-    <ul>
-      <li v-for="cookie in cookies" :key="cookie.name">
-          <p>Name: </p> {{cookie.name}},
-          <p>Path: </p> {{cookie.path}},
-          <p>Secure: </p> {{cookie.secure}}
-      </li>
-    </ul>
-    -->
-    </div>
+     <b-list-group>
+      <!-- Persistent Cookies -->
+    <b-list-group-item button @click="toggleCollapse('persistent')">
+      Persistent Cookies ({{persistentCookies.length}})
+    </b-list-group-item>
+    <b-collapse id="collapse-persistent">
+      <b-card>
+      <b-table :items="persistentCookies" :fields="cookieFields"></b-table>
+      </b-card>
+    </b-collapse>
+
+    <!--Secure Cookies -->
+    <b-list-group-item button @click="toggleCollapse('secure')">
+      Secure Cookies ({{secureCookies.length}})
+    </b-list-group-item>
+    <b-collapse id="collapse-secure">
+      <b-card>
+      <b-table :items="secureCookies" :fields="cookieFields"></b-table>
+      </b-card>
+    </b-collapse>
+
+    <!-- Advertising Cookies -->
+    <b-list-group-item button @click="toggleCollapse('advertising')">
+      Advertising Cookies ({{advertisingCookies.length}})
+    </b-list-group-item>
+    <b-collapse id="collapse-advertising">
+      <b-card>
+      <b-table :items="advertisingCookies" :fields="cookieFields"></b-table>
+      </b-card>
+    </b-collapse>
+
+    <!-- Analytics Cookies -->
+        <b-list-group-item button @click="toggleCollapse('analytics')">
+      Analytics Cookies ({{analyticsCookies.length}})
+    </b-list-group-item>
+    <b-collapse id="collapse-analyticss">
+      <b-card>
+      <b-table :items="analyticsCookies" :fields="cookieFields"></b-table>
+      </b-card>
+    </b-collapse>
+  </b-list-group>
   </div>
 </template>
 
@@ -25,12 +50,12 @@ export default {
   data() {
     return {
       cookies: [],
+      showPersistent: false,
       currentDomain: null,
        fields: [
         { key: 'domain', label: 'Website' },
         { key: 'name', label: 'Cookie Name' },
         { key: 'expirationDate', label: 'Expiration Date' },
-        { key: 'type', label: 'Category'}
       ]
     };
   },
@@ -43,6 +68,18 @@ export default {
           this.cookies = cookies;
         }
       });
+    },
+    cookiesGrid(){
+      return this.formattedCookies.map(cookie => ({
+        domain:  cookie.domain,
+        name: cookie.name,
+        expirationDate: cookie.expirationDate,
+        type: cookie.type
+      }))
+    },
+    toggleCollapse(category){
+      this.$root.$emit('bv::toggle::collapse', 'collapse-' + category);
+      },
     },
     identifyThirdPartyCookies(cookie){
       if (cookie.domain.includes ('ad') || cookie.name.includes('ad')){
@@ -93,9 +130,20 @@ export default {
       if (!timestamp) return 'N/A';
       const date = new Date(timestamp * 1000);
       return date.toLocaleDateString(); 
-    }, 
+    }
   },
   computed: {
+    categorisedCookies(){
+      let categories = {};
+      for (let cookie of this.cookies){
+        let category = this.categorisedCookie(cookie);
+        if (!categories[category]){
+          categories[category] = [];
+        }
+        categories[category].push(cookie);
+      }
+      return categories;
+    },
     formattedCookies() {
       return this.cookies.map(cookie => ({
         ...cookie,
@@ -107,7 +155,10 @@ export default {
       return this.cookie.filter(cookie => !cookie.expirationDate);
     },
     persistentCookies(){
-      return this.cookies.filter(cookie => cookie.expirationDate);
+      return this.cookies.filter(cookie => cookie.expirationDate).map(cookie => ({
+        ...cookie,
+        expirationDate: this.formatExpirationDate(cookie.expirationDate)
+      }));
     },
     firstPartyCookies() {
      // const currentDomain = this.getCurrentDomain();
@@ -129,13 +180,6 @@ export default {
       console.error('Error', error);
     })
   },
-   cookiesGrid(cookies){
-      return cookies.map(cookie => ({
-        name: cookie.name,
-        path: cookie.path,
-        secure: cookie.secure,
-      }));
-    },
 };
 
 
