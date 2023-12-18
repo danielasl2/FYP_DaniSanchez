@@ -45,7 +45,10 @@ export default {
         if(chrome.runtime.lastError){
           console.error('Error: ', chrome.runtime.lastError);
         } else {
-          this.cookies = cookies;
+          this.cookies = cookies.map(cookie => ({
+            ...cookie,
+            expirationDate: this.formatExpirationDate(cookie.expirationDate)
+          }));
           if(typeof callback === 'function'){
             callback();
           }
