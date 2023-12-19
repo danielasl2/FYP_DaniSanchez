@@ -1,9 +1,25 @@
 <template>
   <div>
-    <h1>Cookies!!!!!</h1>
+    <!-- Search Bar -->
+    <b-navbar toggleable="lg" type="dark" variant="dark">
+      <b-navbar-brand href="#">Cookies</b-navbar-brand>
+            <!-- Right aligned nav items -->
+      <b-navbar-nav class="ml-auto">
+        <b-nav-form @submit.prevent="filterCookies">
+          <b-form-input 
+            size="sm" 
+            class="mr-sm-2" 
+            placeholder="Search by name, domain, or expiration date" 
+            v-model="searchQuery"
+          ></b-form-input>
+          <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+        </b-nav-form>
+      </b-navbar-nav>
+    </b-navbar>
+
     <b-list-group>
       <cookie-category
-        v-for="(cookies, category) in categorisedCookies"
+        v-for="(cookies, category) in filteredCookies"
         :key="category"
         :category-name="category"
         :cookies="cookies"
@@ -31,7 +47,8 @@ export default {
        cookieFields: [
         { key: 'domain', label: 'Website' },
         { key: 'expirationDate', label: 'Expiration Date' },
-      ]
+      ],
+      searchQuery:''
     };
   },
   methods: {
@@ -72,6 +89,19 @@ export default {
     },
   },
   computed: {
+    filteredCookies(){
+      if(!this.searchQuery) return this.categorisedCookies;
+
+      return Object.keys(this.categorisedCookies).reduce((filtered, category) => {
+        const filteredCookies = this.categorisedCookies[category].filter(cookie =>
+        cookie.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || cookie.domain.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+        if (filteredCookies.length){
+          filtered[category] = filteredCookies;
+        }
+        return filtered;
+      }, {});
+    },
     formattedCookies() {
       return this.cookies.map(cookie => ({
         ...cookie,
