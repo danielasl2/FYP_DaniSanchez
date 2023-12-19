@@ -93,9 +93,17 @@ export default {
       if(!this.searchQuery) return this.categorisedCookies;
 
       return Object.keys(this.categorisedCookies).reduce((filtered, category) => {
-        const filteredCookies = this.categorisedCookies[category].filter(cookie =>
-        cookie.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || cookie.domain.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
+        const filteredCookies = this.categorisedCookies[category].filter(cookie =>{
+        
+        const searchDate = new Date(this.searchQuery);
+        const cookieDate = new Date(cookie.expirationDate);
+
+        return(
+          cookie.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || cookie.domain.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          (!isNaN(searchDate.getTime()) && cookieDate.toLocaleDateString() === searchDate.toLocaleDateString())
+          );
+        });
+
         if (filteredCookies.length){
           filtered[category] = filteredCookies;
         }
