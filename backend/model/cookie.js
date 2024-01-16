@@ -6,7 +6,10 @@ const cookieSchema = new Schema ({
     domain: String,
     expirationDate: Date,
     category: [String],
-    blockedStatus: Boolean
+    blockedStatus: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const Cookie = mongoose.model('Cookie', cookieSchema);
