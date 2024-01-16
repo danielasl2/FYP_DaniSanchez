@@ -18,6 +18,7 @@
 import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
+//import ApiService from '../api';
 
 export default {
   mixins: [cookieMixin],

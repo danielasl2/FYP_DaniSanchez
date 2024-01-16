@@ -3,6 +3,8 @@ const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
 const mongoDBUri = 'mongodb://localhost:27017/cookiesDB' ; 
+const cors = require('cors');
+app.use(cors());
 
 mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
