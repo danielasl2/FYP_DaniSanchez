@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import axios from 'axios';
+import api from './api';
 
 const store = createStore({
     state: {
@@ -12,14 +12,26 @@ const store = createStore({
                 state.cookies[index] = updatedCookie;
             }
         },
+        SET_COOKIES(state, cookies){
+            state.cookies = cookies;
+        },
     },
     actions: {
-        updateCookieStatus({ commit }, updatedCookie) {
-            axios.patch(`/api/cookies/block/${updatedCookie.id}`, { blockedStatus: updatedCookie.blockedStatus })
-                .then(response => {
-                    commit('UPDATE_COOKIE_STATUS', response.data);
-                })
-                .catch(error => console.error('Error updating cookie status:', error));
+        async fetchCookies({commit}){
+            try{
+                const response = await api.getCookies();
+                commit('SET_COOKIES', response.data);
+            } catch (error){
+                console.log('Error fetching cookies', error);
+            }
+        },
+        async updateCookieStatus({ commit }, updatedCookie) {
+           try{
+            const response = await api.updateCookieStatus(updatedCookie.id, updatedCookie.blockedStatus);
+            commit('UPDATE_COOKIE_STATUS', response.data);
+           } catch(error){
+            console.error('Error updating cookie status: ', error);
+           }
         },
     },
 });

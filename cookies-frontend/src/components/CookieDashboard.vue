@@ -110,6 +110,7 @@ export default {
       this.showGrid[category] = false;
       })
     });
+    this.$store.dispatch('fetchCookies');
   }
 };
 
