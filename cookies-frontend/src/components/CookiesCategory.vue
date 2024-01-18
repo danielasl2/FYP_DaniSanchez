@@ -5,7 +5,11 @@
     </b-list-group-item>
     <b-collapse :id="collapseId" v-model="isCollapsed">
       <b-card>
-        <b-table :items="cookies" :fields="cookieFields"></b-table>
+        <b-table :items="cookies" :fields="cookieFields">
+          <template #cell(blockToggle)="data">
+            <input type="checkbox" v-model="data.item.blockedStatus" @change="toggleBlockStatus(data.item)">
+          </template>
+        </b-table>
       </b-card>
     </b-collapse>
   </div>
@@ -27,6 +31,9 @@ export default {
   methods: {
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
+    },
+    toggleBlockStatus(cookie){
+      this.$emit('update-block-status', {...cookie, blockedStatus: !cookie.blockedStatus});
     }
   }
 };

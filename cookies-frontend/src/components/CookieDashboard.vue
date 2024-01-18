@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Cookies!!!!!</h1>
+        <b-form-input v-model="filterDomain" placeholder="Filter by domain"></b-form-input>
     <b-list-group>
       <cookie-category
         v-for="(cookies, category) in categorisedCookies"
@@ -9,6 +10,7 @@
         :cookies="cookies"
         :cookie-fields="cookieFields"
         :collapse-id="`collapse-${category}`"
+        @update-block-status="handleBlockStatusUpdate"
       />
     </b-list-group>
   </div>
@@ -18,6 +20,7 @@
 import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
+//import ApiService from '../api';
 
 export default {
   mixins: [cookieMixin],
@@ -28,14 +31,19 @@ export default {
     return {
       cookies: [],
       currentDomain: null,
+      filterDomain:'',
        cookieFields: [
         { key: 'domain', label: 'Website' },
         { key: 'expirationDate', label: 'Expiration Date' },
+        { key: 'blockToggle', label: 'Block/Unblock' }
       ]
     };
   },
   methods: {
     formatExpirationDate,
+    handleBlockStatusUpdate(updatedCookie){
+      this.$store.dispatch('updateCookieStatus', updatedCookie);
+    },
     getAllCookies(callback) {
       if(!chrome || !chrome.cookies){
         console.error('chrome.cookies API is not available');
@@ -72,6 +80,12 @@ export default {
     },
   },
   computed: {
+    filteredCookies(){
+      if (!this.filterDomain){
+        return this.cookies;
+      }
+      return this.cookies.filter(cookie => cookie.domain && cookie.domain.includes(this.filterDomain.toLowerCase()));
+    },
     formattedCookies() {
       return this.cookies.map(cookie => ({
         ...cookie,
