@@ -2,22 +2,28 @@ const express = require('express');
 const cookieRoutes = require('../backend/routes/cookieRoute');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const connectionStr = "mongodb+srv://danielasl20:Colombia20@cluster0.isdd3bt.mongodb.net/?retryWrites=true&w=majority";
 
 const app = express();
-const port = process.env.PORT || 3000;
-const mongoDBUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cookiesDB' ; 
+
+//const mongoDBUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cookiesDB' ; 
 
 app.use(cors());
 app.use(express.json());
 app.use('/api', cookieRoutes);
 
-mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
+const port = process.env.PORT || 3000;
+
+mongoose.connect(connectionStr, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function() {
   console.log('Connected to MongoDB');
 });
+/*
 db.on('disconnected', function() {
     console.log('MongoDB disconnected');
 });
@@ -37,6 +43,7 @@ process.on('SIGINT', function() {
       process.exit(0);
   });
 });
+*/
 
 
 app.get('/', (req, res) => {
