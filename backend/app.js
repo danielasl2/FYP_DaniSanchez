@@ -24,6 +24,20 @@ db.on('disconnected', function() {
 db.on('reconnected', function () {
     console.log('MongoDB reconnected');
 });
+db.on('connected', function() {
+  console.log('Mongoose default connections is ope to ', mongoDBUri);
+});
+db.on('error', function(err) {
+  console.log('Mongoose default connection has occurred ' + err + ' error');
+})
+
+process.on('SIGINT', function() {
+  db.close(function() {
+      console.log('Mongoose default connection is disconnected due to application termination');
+      process.exit(0);
+  });
+});
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

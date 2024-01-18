@@ -83,7 +83,7 @@ export const cookieMixin = {
             }
           }
           */
-          this.cookies.forEach(cookie => {
+          this.filteredCookies.forEach(cookie => {
             let category = this.categorisedCookie(cookie);
             if (category && categories[category]) {
               categories[category].push(cookie);
