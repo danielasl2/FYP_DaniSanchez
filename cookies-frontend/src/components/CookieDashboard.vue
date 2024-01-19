@@ -20,7 +20,8 @@
 import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
-//import ApiService from '../api';
+import axios from 'axios';
+import { API_URL} from '../api';
 
 export default {
   mixins: [cookieMixin],
@@ -41,27 +42,27 @@ export default {
   },
   methods: {
     formatExpirationDate,
-    handleBlockStatusUpdate(updatedCookie){
-      this.$store.dispatch('updateCookieStatus', updatedCookie);
-    },
-    getAllCookies(callback) {
-      if(!chrome || !chrome.cookies){
-        console.error('chrome.cookies API is not available');
-        return;
-      }
-      chrome.cookies.getAll({}, (cookies) => {
-        if(chrome.runtime.lastError){
-          console.error('Error: ', chrome.runtime.lastError);
-        } else {
-          this.cookies = cookies.map(cookie => ({
-            ...cookie,
-            expirationDate: this.formatExpirationDate(cookie.expirationDate)
-          }));
-          if(typeof callback === 'function'){
-            callback();
-          }
-        }
-      })
+    async handleBlockStatusUpdate(updatedCookie){
+     try {
+    await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
+      blockedStatus: updatedCookie.blockedStatus
+    });
+  } catch (error) {
+    console.error('Error updating cookies status:', error);
+  }
+},
+    async getAllCookies() {
+       try {
+
+    const response = await axios.get(`${API_URL}/api/cookies`, {timeout:5000});
+    this.cookies = response.data.map(cookie => ({
+      ...cookie,
+      expirationDate: this.formatExpirationDate(cookie.expirationDate),
+      blockedStatus: cookie.blockedStatus 
+    }));
+  } catch (error) {
+    console.error('Error fetching cookies from backend:', error);
+  }
     },
     getCurrentDomain(){
       return new Promise((resolve, reject) =>{

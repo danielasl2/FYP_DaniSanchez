@@ -1,5 +1,5 @@
 const express = require('express');
-const cookieRoutes = require('../backend/routes/cookieRoute');
+const cookieRoutes = require('./routes/cookieRoute');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -11,7 +11,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/api', cookieRoutes);
+app.use('/api/cookies', cookieRoutes);
 
 const port = process.env.PORT || 3000;
 
@@ -47,7 +47,7 @@ process.on('SIGINT', function() {
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hell');
 });
 
 app.listen(port, () => {
