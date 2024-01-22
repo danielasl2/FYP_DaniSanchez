@@ -28,4 +28,15 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.post('/', async (req, res) => {
+    try {
+        const cookies = req.body.cookies;
+        const savedCookies = await Cookie.insertMany(cookies);
+        res.status(201).json(savedCookies);
+    } catch (error) {
+        console.error('Error saving cookies:', error);
+        res.status(500).send('Error saving cookies');
+    }
+});
+
 module.exports = router;

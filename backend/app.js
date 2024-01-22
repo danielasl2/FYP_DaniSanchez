@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cookieRoutes = require('./routes/cookieRoute');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const connectionStr = "mongodb+srv://danielasl20:Colombia20@cluster0.isdd3bt.mongodb.net/?retryWrites=true&w=majority";
+const MONGODB_URI = "mongodb+srv://danielasl20:Colombia20@cluster0.isdd3bt.mongodb.net/?retryWrites=true&w=majority";
 
 const app = express();
 
@@ -15,36 +16,15 @@ app.use('/api/cookies', cookieRoutes);
 
 const port = process.env.PORT || 3000;
 
-mongoose.connect(connectionStr, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function() {
   console.log('Connected to MongoDB');
+  console.log('Connected to DB on host %s and port %s', db.host, db.port);
 });
-/*
-db.on('disconnected', function() {
-    console.log('MongoDB disconnected');
-});
-db.on('reconnected', function () {
-    console.log('MongoDB reconnected');
-});
-db.on('connected', function() {
-  console.log('Mongoose default connections is ope to ', mongoDBUri);
-});
-db.on('error', function(err) {
-  console.log('Mongoose default connection has occurred ' + err + ' error');
-})
-
-process.on('SIGINT', function() {
-  db.close(function() {
-      console.log('Mongoose default connection is disconnected due to application termination');
-      process.exit(0);
-  });
-});
-*/
-
 
 app.get('/', (req, res) => {
   res.send('Hell');

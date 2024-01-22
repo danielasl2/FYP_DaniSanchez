@@ -21,7 +21,8 @@ import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
-import { API_URL} from '../api';
+import api from '../api';
+const { API_URL} = api;
 
 export default {
   mixins: [cookieMixin],
@@ -43,26 +44,24 @@ export default {
   methods: {
     formatExpirationDate,
     async handleBlockStatusUpdate(updatedCookie){
-     try {
-    await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
-      blockedStatus: updatedCookie.blockedStatus
-    });
-  } catch (error) {
-    console.error('Error updating cookies status:', error);
-  }
-},
+      try {
+        await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
+          blockedStatus: updatedCookie.blockedStatus
+          });
+          } catch (error) {
+            console.error('Error updating cookies status:', error);
+            }
+          },
     async getAllCookies() {
-       try {
-
-    const response = await axios.get(`${API_URL}/api/cookies`, {timeout:5000});
-    this.cookies = response.data.map(cookie => ({
-      ...cookie,
-      expirationDate: this.formatExpirationDate(cookie.expirationDate),
-      blockedStatus: cookie.blockedStatus 
-    }));
-  } catch (error) {
-    console.error('Error fetching cookies from backend:', error);
-  }
+      try {
+           const response = await axios.get('http://localhost:3000/api/cookies');
+           this.cookies = response.data.map(cookie => ({
+            ...cookie,
+            expirationDate: this.formatExpirationDate(cookie.expirationDate)
+           }))
+           } catch (error) {
+            console.error('Error fetching cookies from backend:', error);
+            }
     },
     getCurrentDomain(){
       return new Promise((resolve, reject) =>{
@@ -96,6 +95,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.dispatch('fetchCookies');
     this.getAllCookies();
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;
@@ -104,7 +104,6 @@ export default {
       console.error('Error', error);
     })
   },
-  /* to show the grid under each category */
   created(){
     this.getAllCookies(()=>{
       Object.keys(this.categorisedCookies).forEach(category =>{

@@ -1,5 +1,6 @@
 import { createStore } from 'vuex';
 import api from './api';
+import axios from 'axios';
 
 const store = createStore({
     state: {
@@ -19,11 +20,19 @@ const store = createStore({
     actions: {
         async fetchCookies({commit}){
             try{
+                /*
                 const response = await api.getCookies();
                 commit('SET_COOKIES', response.data);
             } catch (error){
                 console.log('Error fetching cookies', error);
+                */
+                const response = await axios.get('http://localhost:3000/api/cookies');
+                commit('SET_COOKIES', response.data);
+              } catch (error) {
+                console.error('Error fetching cookies:', error);
+              }
             }
+            
         },
         async updateCookieStatus({ commit }, updatedCookie) {
            try{
@@ -34,7 +43,7 @@ const store = createStore({
            }
         },
     },
-});
+);
 
 export default store;
 
