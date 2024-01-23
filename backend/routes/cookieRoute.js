@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Cookie = require('../model/cookie');
 
-router.patch('/api/cookies/block/:id', async (req, res) => {
+router.patch('/block/:id', async (req, res) => {
     try {
         const cookieId = req.params.id;
         const blockedStatus = req.body.blockedStatus;
@@ -13,7 +13,7 @@ router.patch('/api/cookies/block/:id', async (req, res) => {
             { blockedStatus }, 
             { new: true }
         );
-        
+
         if (!updatedCookie) {
             return res.status(404).send('Cookie not found');
         }

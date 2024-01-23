@@ -21,7 +21,7 @@ import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
-import api from '../api';
+//import api from '../api';
 //const { API_URL} = api;
 
 export default {
@@ -52,8 +52,9 @@ export default {
     formatExpirationDate,
    async handleBlockStatusUpdate(updatedCookie) {
         try {
-            const response = await api.updateCookieStatus(updatedCookie._id, !updatedCookie.blockedStatus);
-            this.$store.dispatch('updateCookieStatus', response.data);
+            await axios.patch(`http://localhost:3000/api/cookies/block/${updatedCookie._id}`, {
+                blockedStatus: !updatedCookie.blockedStatus
+            });
         } catch (error) {
             console.error('Error updating cookie status:', error);
         }
