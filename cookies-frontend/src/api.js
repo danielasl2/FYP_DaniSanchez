@@ -1,12 +1,14 @@
-/*
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'http://localhost:3000';
 
-
-export default {
-    getCookies () {
-        return axios.get('${API_URL}/cookies')
+const api = {
+    getCookies() {
+        return axios.get(`${API_URL}/api/cookies`);
+    },
+    updateCookieStatus(cookieId, blockedStatus) {
+        return axios.patch(`${API_URL}/cookies/block/${cookieId}`, { blockedStatus });
     }
 }
-*/
+
+export default {API_URL, ...api};

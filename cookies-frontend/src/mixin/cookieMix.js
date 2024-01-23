@@ -1,88 +1,58 @@
 export const cookieMixin = {
     methods: {
-        categorisedCookie(cookie){
-          let category = null; 
+      categorisedCookie(cookie) {
 
-          if (cookie.name.includes('ad') || cookie.domain.includes('ad')) {
-            category = 'Advertising';
-          /*} else if (cookie.name.includes('analytic') || cookie.domain.includes('analytic')) {
-            category = 'Analytics'; */
-          } else if (cookie.name.includes('social') || cookie.domain.includes('social')) {
-            category = 'Social Media';
-          } else if (cookie.name.includes('personalize') || cookie.domain.includes('personalize')) {
-            category = 'Content Personalization';
-          } else if (cookie.name.includes('affiliate') || cookie.domain.includes('affiliate')) {
-            category = 'Affiliate Tracking';
-          /*} else if (cookie.name.includes('replay') || cookie.domain.includes('replay')) {
-            category = 'Session Replay and Heatmap'; */
-          } else if (cookie.name.includes('customer') || cookie.domain.includes('customer')) {
-            category = 'Customer Interaction';
-          /*} else if (cookie.name.includes('pref') || cookie.domain.includes('pref')) {
-            return 'Preferences'; */
-          } else if (cookie.name.includes('loadbal') || cookie.domain.includes('loadbal')){
-            return 'Load Balancing';
-           /*}else if (cookie.name.includes('ui') || cookie.domain.includes('ui')){
-            return 'User Interface'; */
-          /*} else if (cookie.name.includes('security') || cookie.domain.includes('security')){
-            return 'Security'; */
-          /*} else if (cookie.name.includes('compliance') || cookie.domain.includes('compliance')){
-            return 'Compliance'; */
-          }
-          
-          if (cookie.name.includes('ui') || cookie.domain.includes('ui') || cookie.name.includes('pref') || cookie.domain.includes('pref')) {
+        // HttpOnly Cookies: Cookies that cannot be accessed through client-side scripts
+        if (cookie.httpOnly) {
+            return 'HttpOnly Cookies';
+        }
+
+        // Secure Cookies: Cookies that are marked as secure (usually sent over HTTPS)
+        if (cookie.secure) {
+            return 'Secure Cookies';
+        }
+
+        // Session Cookies: Cookies without a specified expiration date (they expire when the session ends)
+        if (!cookie.expirationDate) {
+            return 'Session Cookies';
+        }
+
+        // Persistent Cookies: Cookies with a specified expiration date
+        if (cookie.expirationDate) {
+            return 'Persistent Cookies';
+        }
+
+        // UI and Preferences: Cookies that contain 'ui' or 'pref' in their name
+        if (cookie.name.includes('ui') || cookie.name.includes('pref')) {
             return 'UI and Preferences';
-          }
-          
-          if (cookie.name.includes('analytic') || cookie.domain.includes('analytic') || cookie.name.includes('replay') || cookie.domain.includes('replay')) {
-            return 'Analytics and User Interaction';
-          }
-          
-          if (cookie.name.includes('security') || cookie.domain.includes('security') || cookie.name.includes('compliance') || cookie.domain.includes('compliance')) {
-            return 'Security and Compliance';
-          }
-        
-          if (!category) {
-            console.log('Uncategorised cookie: ', cookie);
-            category = 'Uncategorized';
-          }
-          return category
-          },
+        }
+
+        // Domain-Specific Categories
+        if (cookie.domain.includes('.com')) {
+            return 'Commercial Cookies';
+        }
+
+        if (cookie.domain.includes('.org')) {
+            return 'Organizational Cookies';
+        }
+
+        // Default category for cookies that don't match any specific rule
+        return 'General Cookies';
+    },
 
     },
     computed: {
-        categorisedCookies(){
-            const categories = {
-            'Advertising': [],
-           // 'Analytics': [],
-            'Social Media': [],
-            'Content Personalization': [],
-            'Affiliate Tracking': [],
-           // 'Session Replay and Heatmap': [],
-            'Customer Interaction': [],
-            //'Preferences': [],
-            'Load Balancing':[],
-            //'User Interface': [],
-            //'Secuirty': [],
-            //'Compliance':[],
-            'Persistent': this.persistentCookies,
-            'Session': this.sessionCookies,
-            'Secure' : this.secureCookies,
-            'UI and Preferences':[],
-            'Analytics and User Interaction':[],
-            'Secuirty and Compliance':[]
-          };
-      
-          /*
-          for (let cookie of this.cookies) {
-            let category = this.categorisedCookie(cookie);
-            if (category) {
-                if (!categories[category]) {
-                categories[category] = []; 
-              }
-              categories[category].push(cookie);
-            }
-          }
-          */
+      categorisedCookies() {
+        const categories = {
+          'HttpOnly Cookies': [],
+          'Secure Cookies': [],
+          'Session Cookies': [],
+          'Persistent Cookies': [],
+          'UI and Preferences': [],
+          'Commercial Cookies': [],
+          'Organizational Cookies': [],
+          'General Cookies': [],
+      };
           this.filteredCookies.forEach(cookie => {
             let category = this.categorisedCookie(cookie);
             if (category && categories[category]) {
