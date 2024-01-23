@@ -51,13 +51,14 @@ export default {
   },
     formatExpirationDate,
    async handleBlockStatusUpdate(updatedCookie) {
-  try {
-    await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
-  blockedStatus: updatedCookie.blockedStatus
-});
-  } catch (error) {
-    console.error('Error updating cookie status:', error);
-  }
+    try {
+        const response = await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
+            blockedStatus: !updatedCookie.blockedStatus // Toggle the status
+        });
+        this.$store.dispatch('updateCookieStatus', response.data); // Update Vuex store
+    } catch (error) {
+        console.error('Error updating cookie status:', error);
+    }
 },
      async getAllCookies() {
       try {

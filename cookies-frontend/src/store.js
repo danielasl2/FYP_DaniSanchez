@@ -9,7 +9,7 @@ const store = createStore({
         UPDATE_COOKIE_STATUS(state, updatedCookie) {
             const index = state.cookies.findIndex(cookie => cookie._id === updatedCookie._id);
             if (index !== -1) {
-                state.cookies[index] = updatedCookie;
+                state.cookies.splice(index, 1, updatedCookie);
             }
         },
         SET_COOKIES(state, cookies){

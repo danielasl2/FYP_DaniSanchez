@@ -7,6 +7,7 @@ router.patch('/block/:id', async (req, res) => {
         const cookieId = req.params.id;
         const blockedStatus = req.body.blockedStatus;
         console.log(`Updating cookie ${cookieId} with blockedStatus: ${blockedStatus}`);
+        console.log(`Cookie updated in DB: `, updatedCookie);
 
         const updatedCookie = await Cookie.findByIdAndUpdate(cookieId, { blockedStatus }, { new: true });
         if (!updatedCookie) {
