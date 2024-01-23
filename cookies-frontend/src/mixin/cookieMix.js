@@ -1,45 +1,30 @@
 export const cookieMixin = {
     methods: {
       categorisedCookie(cookie) {
-
-        // HttpOnly Cookies: Cookies that cannot be accessed through client-side scripts
         if (cookie.httpOnly) {
-            return 'HttpOnly Cookies';
+          return 'HttpOnly Cookies';
         }
-
-        // Secure Cookies: Cookies that are marked as secure (usually sent over HTTPS)
         if (cookie.secure) {
-            return 'Secure Cookies';
+          return 'Secure Cookies';
         }
-
-        // Session Cookies: Cookies without a specified expiration date (they expire when the session ends)
-        if (!cookie.expirationDate) {
-            return 'Session Cookies';
+        if (!('expirationDate' in cookie) || cookie.session) {
+          return 'Session Cookies';
         }
-
-        // Persistent Cookies: Cookies with a specified expiration date
-        if (cookie.expirationDate) {
-            return 'Persistent Cookies';
+        if ('expirationDate' in cookie) {
+          return 'Persistent Cookies';
         }
-
-        // UI and Preferences: Cookies that contain 'ui' or 'pref' in their name
-        if (cookie.name.includes('ui') || cookie.name.includes('pref')) {
-            return 'UI and Preferences';
+        if (/ui|pref/.test(cookie.name)) {
+          return 'UI and Preferences';
         }
-
-        // Domain-Specific Categories
+        // Add more categories as needed
         if (cookie.domain.includes('.com')) {
-            return 'Commercial Cookies';
+          return 'Commercial Cookies';
         }
-
         if (cookie.domain.includes('.org')) {
-            return 'Organizational Cookies';
+          return 'Organizational Cookies';
         }
-
-        // Default category for cookies that don't match any specific rule
-        return 'General Cookies';
-    },
-
+        return 'General Cookies'; // Default category
+      },
     },
     computed: {
       categorisedCookies() {
@@ -53,15 +38,14 @@ export const cookieMixin = {
           'Organizational Cookies': [],
           'General Cookies': [],
       };
-          this.filteredCookies.forEach(cookie => {
-            let category = this.categorisedCookie(cookie);
-            if (category && categories[category]) {
-              categories[category].push(cookie);
-            }
-          });
-
-            return categories;
-          },
+      this.filteredCookies.forEach(cookie => {
+        let category = this.categorisedCookie(cookie);
+        if (categories[category]) {
+          categories[category].push(cookie);
+        }
+      });
+      return categories;
+    },
           sessionCookies() {
             return this.cookies.filter(cookie => !cookie.expirationDate);
           },

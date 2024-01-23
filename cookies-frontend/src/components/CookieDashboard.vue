@@ -42,27 +42,34 @@ export default {
     };
   },
   methods: {
+    handleCookiesReceived(cookies) {
+    console.log("Cookies received in Vue component:", cookies); 
+    this.cookies = cookies.map(cookie => ({
+      ...cookie,
+      expirationDate: this.formatExpirationDate(cookie.expirationDate)
+    }));
+  },
     formatExpirationDate,
-    async handleBlockStatusUpdate(updatedCookie){
+   async handleBlockStatusUpdate(updatedCookie) {
+  try {
+    await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
+  blockedStatus: updatedCookie.blockedStatus
+});
+  } catch (error) {
+    console.error('Error updating cookie status:', error);
+  }
+},
+     async getAllCookies() {
       try {
-        await axios.patch(`${API_URL}/api/cookies/block/${updatedCookie._id}`, {
-          blockedStatus: updatedCookie.blockedStatus
-          });
-          } catch (error) {
-            console.error('Error updating cookies status:', error);
-            }
-          },
-    async getAllCookies() {
-      try {
-           const response = await axios.get('http://localhost:3000/api/cookies');
-           this.cookies = response.data.map(cookie => ({
-            ...cookie,
-            expirationDate: this.formatExpirationDate(cookie.expirationDate)
-           }))
-           } catch (error) {
-            console.error('Error fetching cookies from backend:', error);
-            }
-    },
+    const response = await axios.get('http://localhost:3000/api/cookies');
+    this.cookies = response.data.map(cookie => ({
+      ...cookie,
+      expirationDate: this.formatExpirationDate(cookie.expirationDate)
+    }));
+  } catch (error) {
+    console.error('Error fetching cookies from backend:', error);
+  }
+            },
     getCurrentDomain(){
       return new Promise((resolve, reject) =>{
         chrome.tabs.query({active:true, currentWindow: true}, (tabs) => {
@@ -105,12 +112,21 @@ export default {
     })
   },
   created(){
+      window.addEventListener("message", (event) => {
+    if (event.source === window && event.data && event.data.type === "FROM_EXTENSION") {
+      if (event.data.action === "displayCookies") {
+        this.handleCookiesReceived(event.data.data.cookies);
+      }
+    }
+  });
+    /*
     this.getAllCookies(()=>{
       Object.keys(this.categorisedCookies).forEach(category =>{
       this.showGrid[category] = false;
       })
     });
     this.$store.dispatch('fetchCookies');
+    */
   }
 };
 
