@@ -7,8 +7,8 @@ const api = {
         return axios.get(`${API_URL}/api/cookies`);
     },
     updateCookieStatus(cookieId, blockedStatus) {
-        return axios.patch(`${API_URL}/cookies/block/${cookieId}`, { blockedStatus });
-    }
+        return axios.patch(`${API_URL}/api/cookies/block/${cookieId}`, { blockedStatus });
+    }    
 }
 
 export default {API_URL, ...api};
