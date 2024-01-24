@@ -26,12 +26,12 @@ const store = createStore({
             }
         },
         async updateCookieStatus({ commit }, updatedCookie) {
-           try {
-            const response = await api.updateCookieStatus(updatedCookie._id, updatedCookie.blockedStatus);
-            commit('UPDATE_COOKIE_STATUS', response.data);
-           } catch(error) {
-            console.error('Error updating cookie status: ', error);
-           }
+            try {
+                const response = await api.updateCookieStatus(updatedCookie._id, updatedCookie.blockedStatus);
+                commit('UPDATE_COOKIE_STATUS', response.data);
+            } catch (error) {
+                console.error('Error updating cookie status:', error);
+            }
         },
     },
 });

@@ -7,9 +7,13 @@ router.patch('/block/:id', async (req, res) => {
         const cookieId = req.params.id;
         const blockedStatus = req.body.blockedStatus;
         console.log(`Updating cookie ${cookieId} with blockedStatus: ${blockedStatus}`);
-        console.log(`Cookie updated in DB: `, updatedCookie);
 
-        const updatedCookie = await Cookie.findByIdAndUpdate(cookieId, { blockedStatus }, { new: true });
+        const updatedCookie = await Cookie.findByIdAndUpdate(
+            cookieId, 
+            { blockedStatus }, 
+            { new: true }
+        );
+
         if (!updatedCookie) {
             return res.status(404).send('Cookie not found');
         }
@@ -19,6 +23,7 @@ router.patch('/block/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 
 router.get('/', async (req, res) => {
