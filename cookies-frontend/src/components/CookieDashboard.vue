@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       lastUpdateTimestamp: 0,
-      updateInterval: 30000,
+      updateInterval: 100,
       allCookies: {},
       cookies: [],
       currentDomain: null,

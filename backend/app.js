@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json({ limit: '50mb' })); 
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-//const mongoDBUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cookiesDB' ; 
+
 
 app.use(cors());
 app.use(express.json());
