@@ -14,3 +14,6 @@ chrome.runtime.onMessage.addListener((message) => {
     window.postMessage({ type: "FROM_EXTENSION", action: "displayCookies", data: message.data }, "*");
   }
 });
+
+chrome.runtime.sendMessage({ action: "contentScriptReady" });
+

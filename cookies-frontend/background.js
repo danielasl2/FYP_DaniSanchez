@@ -1,99 +1,40 @@
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.active) {
-
-    chrome.cookies.getAll({}, (cookies) => {
-      if (chrome.runtime.lastError) {
-        console.error('Error retrieving cookies:', chrome.runtime.lastError);
-      } else {
-        chrome.runtime.sendMessage({ action: "displayCookies", data: { cookies } });
-      }
-    });
-  }
-});
-
-
-
 /*
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.status === 'complete' && tab.active && tab.url) {
-    chrome.cookies.getAll({ url: tab.url }, function(cookies) {
-      if (chrome.runtime.lastError) {
-        console.error('Error retrieving cookies:', chrome.runtime.lastError);
-      } else {
-        fetch('http://localhost:3000/api/cookies', {
-          method:'POST',
-          headers:{ 'Content-Type': 'application/json',},
-          body: JSON.stringify({cookies}),
-        })
-        .then(response => {
-          if (!response.ok){
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json()
-        })
-        .then(data => console.log(data))
-        .catch(error => console.log('Error: ', error));
-      }
-    });
-  }
-});
+function sendCookiesToServer(cookies) {
+  fetch('http://localhost:3000/api/cookies', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cookies })
+  })
+  .then(response => response.json())
+  .then(data => console.log("Cookies sent to server:", data))
+  .catch(error => console.error('Error sending cookies to server:', error));
+}
 
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getCookies" && request.data && request.data.url) {
-    chrome.cookies.getAll({ url: request.data.url }, (cookies) => {
-      if (chrome.runtime.lastError) {
-        sendResponse({ error: chrome.runtime.lastError.message });
-        return; 
-      }
-
-      fetch('http://localhost:3000/api/cookies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cookies })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        sendResponse({ data }); 
-      })
-      .catch(error => {
-        console.log('Error:', error);
-        sendResponse({ error: error.message }); 
-      });
-    });
-    return true; 
-  }
-});
-*/
-/*
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.active) {
-    chrome.cookies.getAll({ url: tab.url }, (cookies) => {
-      if (chrome.runtime.lastError) {
-        console.error('Error retrieving cookies:', chrome.runtime.lastError);
-      } else {
-        chrome.runtime.sendMessage({ action: "cookiesFetched", data: { cookies } });
-      }
-    });
-  }
-});
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getCookies" && request.data && request.data.url) {
-    chrome.cookies.getAll({ url: request.data.url }, (cookies) => {
-      if (chrome.runtime.lastError) {
-        sendResponse({ error: chrome.runtime.lastError.message });
-      } else {
-        sendResponse({ cookies });
-      }
-    });
-    return true;
-  }
-});
+function getAllCookiesAndSendToServer() {
+  chrome.cookies.getAll({}, function(cookies) {
+    if (chrome.runtime.lastError) {
+      console.error('Error retrieving cookies:', chrome.runtime.lastError);
+      return;
+    }
+    sendCookiesToServer(cookies);
+  });
+}
 */
 
+let contentScriptLoaded = false;
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message.action === "contentScriptReady") {
+    contentScriptLoaded = true;
+  }
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.active && contentScriptLoaded) {
+    getAllCookiesAndSendToServer();
+  }
+});
+
+chrome.cookies.onChanged.addListener(() => {
+  getAllCookiesAndSendToServer();
+});
