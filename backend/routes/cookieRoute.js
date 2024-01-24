@@ -38,8 +38,24 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const cookies = req.body.cookies;
-        const savedCookies = await Cookie.insertMany(cookies);
-        res.status(201).json(savedCookies);
+        const responses = [];
+
+        for (const cookie of cookies) {
+            const cookieId = `${cookie.domain}-${cookie.name}`;
+            let foundCookie = await CookieModel.findOne({ identifier: cookieId });
+
+            if (foundCookie) {
+                Object.assign(foundCookie, cookie);
+                await foundCookie.save();
+                responses.push({ action: 'updated', cookie: foundCookie });
+            } else {
+                const newCookie = new CookieModel({ ...cookie, identifier: cookieId });
+                await newCookie.save();
+                responses.push({ action: 'created', cookie: newCookie });
+            }
+        }
+
+        res.status(201).json(responses);
     } catch (error) {
         console.error('Error saving cookies:', error);
         res.status(500).send('Error saving cookies');

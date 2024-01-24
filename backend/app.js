@@ -7,6 +7,9 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const MONGODB_URI = "mongodb+srv://danielasl20:Colombia20@cluster0.isdd3bt.mongodb.net/?retryWrites=true&w=majority";
 
 const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json({ limit: '50mb' })); 
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 //const mongoDBUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cookiesDB' ; 
 
@@ -33,3 +36,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
