@@ -30,7 +30,7 @@ db.once('open', function() {
 });
 
 app.get('/', (req, res) => {
-  res.send('Hell');
+  res.send('Hello');
 });
 
 app.listen(port, () => {

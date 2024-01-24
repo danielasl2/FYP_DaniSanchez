@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Cookie = require('../model/cookie');
 
+
 router.patch('/block/:id', async (req, res) => {
     try {
         const cookieId = req.params.id;
         const blockedStatus = req.body.blockedStatus;
-        console.log(`Updating cookie ${cookieId} with blockedStatus: ${blockedStatus}`);
 
         const updatedCookie = await Cookie.findByIdAndUpdate(
             cookieId, 
@@ -24,8 +24,6 @@ router.patch('/block/:id', async (req, res) => {
     }
 });
 
-
-
 router.get('/', async (req, res) => {
     try {
         const cookies = await Cookie.find({});
@@ -42,14 +40,14 @@ router.post('/', async (req, res) => {
 
         for (const cookie of cookies) {
             const cookieId = `${cookie.domain}-${cookie.name}`;
-            let foundCookie = await CookieModel.findOne({ identifier: cookieId });
+            let foundCookie = await Cookie.findOne({ identifier: cookieId });
 
             if (foundCookie) {
                 Object.assign(foundCookie, cookie);
                 await foundCookie.save();
                 responses.push({ action: 'updated', cookie: foundCookie });
             } else {
-                const newCookie = new CookieModel({ ...cookie, identifier: cookieId });
+                const newCookie = new Cookie({ ...cookie, identifier: cookieId });
                 await newCookie.save();
                 responses.push({ action: 'created', cookie: newCookie });
             }
