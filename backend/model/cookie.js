@@ -5,7 +5,8 @@ const cookieSchema = new Schema ({
     name: String,
     domain: String,
     expirationDate: Date,
-    category: [String],
+    identifier: String,
+    category: String,
     blockedStatus: {
         type: Boolean,
         default: false

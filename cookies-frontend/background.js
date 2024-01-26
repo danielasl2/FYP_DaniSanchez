@@ -1,13 +1,25 @@
-/*
+let sentCookies = {};
+
 function sendCookiesToServer(cookies) {
-  fetch('http://localhost:3000/api/cookies', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cookies })
-  })
-  .then(response => response.json())
-  .then(data => console.log("Cookies sent to server:", data))
-  .catch(error => console.error('Error sending cookies to server:', error));
+  const newOrUpdatedCookies = cookies.filter(cookie => {
+    const cookieId = `${cookie.domain}-${cookie.name}`;
+    if (!sentCookies[cookieId] || sentCookies[cookieId] !== cookie.value) {
+      sentCookies[cookieId] = cookie.value;
+      return true;
+    }
+    return false;
+  });
+
+  if (newOrUpdatedCookies.length > 0) {
+    fetch('http://localhost:3000/api/cookies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cookies: newOrUpdatedCookies })
+    })
+    .then(response => response.json())
+    .then(data => console.log("Cookies sent to server:", data))
+    .catch(error => console.error('Error sending cookies to server:', error));
+  }
 }
 
 function getAllCookiesAndSendToServer() {
@@ -19,7 +31,6 @@ function getAllCookiesAndSendToServer() {
     sendCookiesToServer(cookies);
   });
 }
-*/
 
 let contentScriptLoaded = false;
 
