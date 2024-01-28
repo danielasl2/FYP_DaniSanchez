@@ -1,7 +1,14 @@
 let sentCookies = {};
 
 function sendCookiesToServer(cookies) {
-  const newOrUpdatedCookies = cookies.filter(cookie => {
+  const formattedCookies = cookies.map(cookie => {
+    if (cookie.expirationDate) {
+      
+      cookie.expirationDate = new Date(cookie.expirationDate * 1000);
+    }
+    return cookie;
+  });
+  const newOrUpdatedCookies = formatExDateCookies.filter(cookie => {
     const cookieId = `${cookie.domain}-${cookie.name}`;
     if (!sentCookies[cookieId] || sentCookies[cookieId] !== cookie.value) {
       sentCookies[cookieId] = cookie.value;
@@ -29,6 +36,7 @@ function getAllCookiesAndSendToServer() {
       return;
     }
     sendCookiesToServer(cookies);
+
   });
 }
 
