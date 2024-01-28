@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 const cookieSchema = new Schema ({
     name: String,
     domain: String,
-    expirationDate: Date,
     identifier: String,
+    expirationDate: Date,
     category: String,
     blockedStatus: {
         type: Boolean,
