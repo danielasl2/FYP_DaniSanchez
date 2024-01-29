@@ -1,17 +1,12 @@
 export const cookieMixin = {
   methods: {
     categorisedCookie(cookie) {
-      // Check for specific cookie properties first
-      if (cookie.httpOnly) {
-        return 'HttpOnly Cookies';
-      }
       if (cookie.secure) {
         return 'Secure Cookies';
       }
   
-      // Categorize based on cookie names and domains
       if (cookie.name.includes('ad') || cookie.domain.includes('ad')) {
-        return 'Advertising';
+        return 'Advertising Cookies';
       }
       if (/ui|pref/.test(cookie.name)) {
         return 'UI and Preferences';
@@ -23,7 +18,6 @@ export const cookieMixin = {
         return 'Organizational Cookies';
       }
   
-      // Check if the cookie is persistent or session-based
       if (!('expirationDate' in cookie) || cookie.session) {
         return 'Session Cookies';
       }
@@ -31,22 +25,34 @@ export const cookieMixin = {
         return 'Persistent Cookies';
       }
   
-      // Default category
       return 'General Cookies';
     },
+    getColourForCategory(category){
+      const colours = {
+        'Advertising Cookies' :'#4BBD7E',
+        'Secure Cookies': '#BAD6A3',
+        'Session Cookies': '#F7E7AD',
+        'Persistent Cookies': '#FFBADE',
+        'UI and Preferences': '#9A92D4',
+        'Commercial Cookies': '#100387',
+        'Organizational Cookies': '#D84364',
+        //'General Cookies': '',
+      }
+      console.log(`Colour for ${category}:`, colours[category]);
+      return colours[category] || '#000000';
+    }
   },
   computed: {
     categorisedCookies() {
       const categories = {
-        'Advertising': [],
-        'HttpOnly Cookies': [],
+        'Advertising Cookies': [],
         'Secure Cookies': [],
         'Session Cookies': [],
         'Persistent Cookies': [],
         'UI and Preferences': [],
         'Commercial Cookies': [],
         'Organizational Cookies': [],
-        'General Cookies': [],
+        //'General Cookies': [],
       };
       this.filteredCookies.forEach(cookie => {
         const category = this.categorisedCookie(cookie);
@@ -66,18 +72,21 @@ export const cookieMixin = {
     preferencesCookies() {
       return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'UI and Preferences');
     },
-    loadBalancingCookies() {
-      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'Load Balancing');
-    },
-    userInterfaceCookies() {
-      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'User Interface');
-    },
-    securityCookies() {
-      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'Security');
-    },
-    complianceCookies() {
-      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'Compliance');
-    },
-    // ... additional computed properties for other categories
+    
+    chartData (){
+      const data = {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [],
+        }]
+      };
+      Object.keys(this.categorisedCookies).forEach(category => {
+        data.labels.push(category);
+        data.datasets[0].data.push(this.categorisedCookies[category].length);
+        data.datasets[0].backgroundColor.push(this.getColourForCategory(category));
+      });
+      return data;
+    }
   }
 };

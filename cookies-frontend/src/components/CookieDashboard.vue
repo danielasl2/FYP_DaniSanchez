@@ -1,18 +1,23 @@
 <template>
-  <div>
-    <h1>Cookies!!!!!</h1>
-    <b-form-input v-model="filterDomain" placeholder="Filter by domain"></b-form-input>
-    <b-list-group>
-      <cookie-category
-        v-for="(cookies, category) in categorisedCookies"
-        :key="category"
-        :category-name="category"
-        :cookies="cookies"
-        :cookie-fields="cookieFields"
-        :collapse-id="`collapse-${category}`"
-        @update-block-status="handleBlockStatusUpdate"
-      />
-    </b-list-group>
+  <div class="container">
+  <!--  <div class="chart-container"> -->
+      <cookie-charts :chart-data="chartData"></cookie-charts>
+  <!--  </div> -->
+    <div class="list-container">
+      <h1>Cookies</h1>
+      <b-form-input v-model="filterDomain" placeholder="Filter by domain"></b-form-input>
+      <b-list-group>
+        <cookie-category
+          v-for="(cookies, category) in categorisedCookies"
+          :key="category"
+          :category-name="category"
+          :cookies="cookies"
+          :cookie-fields="cookieFields"
+          :collapse-id="`collapse-${category}`"
+          @update-block-status="handleBlockStatusUpdate"
+        />
+      </b-list-group>
+    </div>
   </div>
 </template>
 
@@ -21,11 +26,13 @@ import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
+import CookieCharts from './CookieCharts.vue';
 
 export default {
   mixins: [cookieMixin],
   components: {
-    CookieCategory
+    CookieCategory,
+    CookieCharts
   },
   data() {
     return {

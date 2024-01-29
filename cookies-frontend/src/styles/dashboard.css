@@ -1,5 +1,18 @@
-body {
-    width: 600px; 
-    height: 400px;
-    overflow: auto; 
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  width: 600px;
+  height: 700px;
 }
+
+.chart-container {
+  width: 250px;
+  height: 600px; 
+}
+
+.list-container {
+  width: 350px; 
+  overflow: auto;
+}
+
