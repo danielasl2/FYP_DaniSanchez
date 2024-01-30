@@ -1,10 +1,31 @@
 <template>
-  <div class="container">
-  <!--  <div class="chart-container"> -->
+  <div>
+    <!-- Navbar -->
+    <b-navbar type="dark" variant="light">
+      <b-navbar-brand href="#">Cookies</b-navbar-brand>
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav>
+          <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Charts</b-nav-item>
+          <b-nav-item href="#">Cookies key</b-nav-item>
+        </b-navbar-nav>
+
+        <!-- Filter bar -->
+        <b-navbar-nav class="ml-auto">
+          <b-nav-form>
+            <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
+          </b-nav-form>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+
+    <!-- Charts Section (Shown when 'Charts' is clicked) -->
+    <div v-if="showCharts" class="chart-container">
       <cookie-charts :chart-data="chartData"></cookie-charts>
-  <!--  </div> -->
+    </div>
+
+    <!-- List of Categorised Cookies -->
     <div class="list-container">
-      <b-form-input v-model="filterDomain" placeholder="Filter by domain"></b-form-input>
       <b-list-group>
         <cookie-category
           v-for="(cookies, category) in categorisedCookies"
@@ -19,6 +40,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import { cookieMixin } from '../mixin/cookieMix';
@@ -35,6 +57,7 @@ export default {
   },
   data() {
     return {
+      showCharts:false,
       lastUpdateTimestamp: 0,
       updateInterval: 100,
       allCookies: {},

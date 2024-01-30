@@ -3,16 +3,16 @@
   display: flex;
   justify-content: space-between;
   width: 600px;
-  height: 900px;
+  height: 800px;
 }
 
 .chart-container {
-  width: 250px;
-  height: 800px; 
+  width: 45%;
+  height: 45%; 
 }
 
 .list-container {
-  width: 350px; 
+  width: 100%; 
   overflow: auto;
 }
 
