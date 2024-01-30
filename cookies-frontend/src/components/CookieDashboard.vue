@@ -4,7 +4,6 @@
       <cookie-charts :chart-data="chartData"></cookie-charts>
   <!--  </div> -->
     <div class="list-container">
-      <h1>Cookies</h1>
       <b-form-input v-model="filterDomain" placeholder="Filter by domain"></b-form-input>
       <b-list-group>
         <cookie-category

@@ -3,12 +3,12 @@
   display: flex;
   justify-content: space-between;
   width: 600px;
-  height: 700px;
+  height: 900px;
 }
 
 .chart-container {
   width: 250px;
-  height: 600px; 
+  height: 800px; 
 }
 
 .list-container {
