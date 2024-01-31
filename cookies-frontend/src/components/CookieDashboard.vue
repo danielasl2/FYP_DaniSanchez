@@ -21,7 +21,7 @@
 
     <!-- Charts Section (Shown when 'Charts' is clicked) -->
     <div v-if="showCharts" class="chart-container">
-      <cookie-charts :chart-data="chartData"></cookie-charts>
+      <doughnut-chart :chart-data="doughnutChartData"></doughnut-chart>
     </div>
 
     <!-- List of Categorised Cookies -->
@@ -47,13 +47,13 @@ import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
-import CookieCharts from './CookieCharts.vue';
+import DoughnutChart from './charts/DoughnutChart.vue';
 
 export default {
   mixins: [cookieMixin],
   components: {
     CookieCategory,
-    CookieCharts
+    DoughnutChart
   },
   data() {
     return {
@@ -130,6 +130,21 @@ export default {
     },
   },
   computed: {
+    doughnutChartData() {
+    let categoryCounts = {};
+    this.cookies.forEach(cookie => {
+      let category = this.categorisedCookie(cookie);
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+
+    return {
+      labels: Object.keys(categoryCounts),
+      datasets: [{
+        data: Object.values(categoryCounts),
+        backgroundColor: Object.keys(categoryCounts).map(category => this.getColourForCategory(category))
+      }]
+    };
+  },
     filteredCookies() {
       if (!this.filterDomain) {
         return this.cookies;
