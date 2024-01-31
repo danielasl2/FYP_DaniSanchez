@@ -22,6 +22,9 @@
     <!-- Charts Section (Shown when 'Charts' is clicked) -->
     <div v-if="showCharts" class="chart-container">
       <doughnut-chart :chart-data="doughnutChartData"></doughnut-chart>
+      <horizontal-bar-chart :chart-data="horizontalBarChartData"></horizontal-bar-chart>
+      <bar-chart :chart-data="barChartData"></bar-chart>
+
     </div>
 
     <!-- List of Categorised Cookies -->
@@ -48,12 +51,17 @@ import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
 import DoughnutChart from './charts/DoughnutChart.vue';
+import HorizontalBarChart from './charts/HorizontalBChart.vue';
+import BarChart from './charts/BarChart.vue';
+
 
 export default {
   mixins: [cookieMixin],
   components: {
     CookieCategory,
-    DoughnutChart
+    DoughnutChart,
+    HorizontalBarChart,
+    BarChart
   },
   data() {
     return {
@@ -130,6 +138,46 @@ export default {
     },
   },
   computed: {
+    barChartData() {
+    let domainCounts = {};
+    this.cookies.forEach(cookie => {
+      domainCounts[cookie.domain] = (domainCounts[cookie.domain] || 0) + 1;
+    });
+
+    return {
+      labels: Object.keys(domainCounts),
+      datasets: [{
+        label: 'Number of Cookies',
+        data: Object.values(domainCounts),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    };
+  },
+    horizontalBarChartData() {
+    let blockedCount = 0;
+    let unblockedCount = 0;
+
+    this.cookies.forEach(cookie => {
+      if (cookie.blockedStatus) {
+        blockedCount++;
+      } else {
+        unblockedCount++;
+      }
+    });
+
+    return {
+      labels: ['Blocked', 'Unblocked'],
+      datasets: [{
+        label: 'Cookies',
+        data: [blockedCount, unblockedCount],
+        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
+        borderWidth: 1
+      }]
+    };
+  },
     doughnutChartData() {
     let categoryCounts = {};
     this.cookies.forEach(cookie => {

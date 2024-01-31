@@ -1,7 +1,7 @@
 <template>
   <div>
-    <canvas ref="chartCanvas"></canvas>
-    <h7>Distribution of Cookies for different Categories</h7>
+    <canvas ref="barChartCanvas"></canvas>
+    <h7> Number of Cookies per Website</h7>
   </div>
 </template>
 
@@ -13,12 +13,11 @@ export default {
     chartData: Object
   },
   mounted() {
-    const ctx = this.$refs.chartCanvas.getContext('2d');
+    const ctx = this.$refs.barChartCanvas.getContext('2d');
     new Chart(ctx, {
-      type: 'doughnut',
+      type: 'bar',
       data: this.chartData,
-      options: {
-      }
+      options: {}
     });
   }
 };
