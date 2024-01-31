@@ -57,7 +57,7 @@ export const cookieMixin = {
        // 'HttpOnly Cookies': '#A4C3B2',
         'Tracking Cookies': '#E6E6EA',
         'Necessary Cookies':  '#A4C3B2',
-        'Customization Cookies': '#8AC6D1' ,
+        'Customization Cookies': '#FDEBA7' ,
       };
       return colours[category] || '#000000';
     }
@@ -101,6 +101,23 @@ export const cookieMixin = {
         data.datasets[0].backgroundColor.push(this.getColourForCategory(category));
       });
       return data;
+    },
+    barChartData() {
+      let domainCounts = {};
+      this.cookies.forEach(cookie => {
+        domainCounts[cookie.domain] = (domainCounts[cookie.domain] || 0) + 1;
+      });
+  
+      return {
+        labels: Object.keys(domainCounts),
+        datasets: [{
+          label: 'Number of Cookies',
+          data: Object.values(domainCounts),
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      };
     }
   }
 };
