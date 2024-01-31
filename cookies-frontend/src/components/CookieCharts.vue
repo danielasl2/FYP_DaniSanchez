@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas ref="barChartCanvas"></canvas>
+    <canvas ref="chartCanvas"></canvas>
   </div>
 </template>
 
@@ -8,16 +8,16 @@
 import Chart from 'chart.js/auto';
 
 export default {
-  name: "BarChart",
   props: {
     chartData: Object
   },
   mounted() {
-    const ctx = this.$refs.barChartCanvas.getContext('2d');
+    const ctx = this.$refs.chartCanvas.getContext('2d');
     new Chart(ctx, {
-      type: 'bar',
+      type: 'doughnut',
       data: this.chartData,
-      options: {}
+      options: {
+      }
     });
   }
 };

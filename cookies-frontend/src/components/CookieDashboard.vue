@@ -6,7 +6,7 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-<b-nav-item href="#" @click="toggleChartsDisplay">Charts</b-nav-item>
+          <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Charts</b-nav-item>
           <b-nav-item href="#">Cookies key</b-nav-item>
         </b-navbar-nav>
 
@@ -19,10 +19,9 @@
       </b-collapse>
     </b-navbar>
 
-    <!-- Charts Section -->
-<div v-if="showCharts" class="chart-container">
-      <doughnut-chart :chart-data="doughnutChartData"></doughnut-chart>
-      <bar-chart :chart-data="barChartData"></bar-chart>
+    <!-- Charts Section (Shown when 'Charts' is clicked) -->
+    <div v-if="showCharts" class="chart-container">
+      <cookie-charts :chart-data="chartData"></cookie-charts>
     </div>
 
     <!-- List of Categorised Cookies -->
@@ -48,15 +47,13 @@ import { cookieMixin } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
-import DoughnutChart from './charts/DoughnutChart.vue';
-import BarChart from './charts/BarChart.vue';
+import CookieCharts from './CookieCharts.vue';
 
 export default {
   mixins: [cookieMixin],
   components: {
     CookieCategory,
-    DoughnutChart,
-    BarChart,
+    CookieCharts
   },
   data() {
     return {
@@ -75,9 +72,6 @@ export default {
     };
   },
   methods: {
-      toggleChartsDisplay() {
-    this.showCharts = !this.showCharts;
-  },
     shouldSendUpdate() {
       const now = Date.now();
       if (now - this.lastUpdateTimestamp > this.updateInterval) {
