@@ -19,7 +19,7 @@
       </b-collapse>
     </b-navbar>
 
-    <!-- Charts Section (Shown when 'Charts' is clicked) -->
+    <!-- Charts Section-->
     <div v-if="showCharts" class="chart-container">
       <doughnut-chart :chart-data="doughnutChartData"></doughnut-chart>
       <horizontal-bar-chart :chart-data="horizontalBarChartData"></horizontal-bar-chart>
