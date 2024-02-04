@@ -1,5 +1,30 @@
-body {
-    width: 600px; 
-    height: 400px;
-    overflow: auto; 
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr; 
+  grid-template-rows: auto 1fr; 
+  gap: 0px; /* Remove gap if you don't want space between grid items */
+  padding: 0; 
+  width: 570px; 
+  height: auto; 
+  overflow: hidden; 
+  margin:  0;
 }
+
+.chart-container, .list-container {
+  width: 100%;
+  overflow: auto; 
+  margin: 0; 
+  padding: 0; 
+}
+
+.navbar-container {
+  width: 100%; 
+  margin: 0; 
+  padding: 0; 
+}
+
+.chart-canvas {
+  max-height: 400px;
+}
+
