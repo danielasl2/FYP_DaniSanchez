@@ -1,23 +1,25 @@
 <template>
-  <div>
+  <div class="container">
     <!-- Navbar -->
-    <b-navbar type="dark" variant="light">
-      <b-navbar-brand href="#">Cookies</b-navbar-brand>
-      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-      <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav>
-          <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Charts</b-nav-item>
-          <b-nav-item href="#">Cookies key</b-nav-item>
-        </b-navbar-nav>
+<b-navbar type="dark" variant="light">
+  <b-navbar-brand href="#">Cookies Board</b-navbar-brand>
+  <b-collapse id="nav-collapse" is-nav>
 
-        <!-- Filter bar -->
-        <b-navbar-nav class="ml-auto">
-          <b-nav-form>
-            <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
-          </b-nav-form>
-        </b-navbar-nav>
-      </b-collapse>
-    </b-navbar>
+    <b-navbar-nav>
+      <b-nav-item @click="showCookieKey('Key')">Key</b-nav-item>
+    </b-navbar-nav>
+        <b-modal v-model="showKey" title="Cookie Descriptions">
+      <p class="mb-0">{{ currentDescription }}</p>
+        </b-modal>
+
+    <b-navbar-nav class="ml-auto">
+      <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Analytics</b-nav-item>
+      <b-nav-form>
+        <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
+      </b-nav-form>
+    </b-navbar-nav>
+  </b-collapse>
+</b-navbar>
 
     <!-- Charts Section-->
     <div v-if="showCharts" class="chart-container">
@@ -53,9 +55,11 @@ import axios from 'axios';
 import DoughnutChart from './charts/DoughnutChart.vue';
 import HorizontalBarChart from './charts/HorizontalBChart.vue';
 import BarChart from './charts/BarChart.vue';
+import cookieKey from './CookieKey';
 
 
 export default {
+  name: 'CookieKey',
   mixins: [cookieMixin],
   components: {
     CookieCategory,
@@ -80,6 +84,11 @@ export default {
     };
   },
   methods: {
+    showCookieKey(key){
+      this.currentKey = cookieKey[key];
+      this.showKey = true;
+      alert(cookieKey[key]);
+    },
     shouldSendUpdate() {
       const now = Date.now();
       if (now - this.lastUpdateTimestamp > this.updateInterval) {
@@ -232,3 +241,4 @@ export default {
 
 <style scoped>
 </style>
+./CookieKey.js

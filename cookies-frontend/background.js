@@ -13,7 +13,6 @@ function sendCookiesToServer(cookies) {
     const cookieId = `${cookie.domain}-${cookie.name}`;
     if (!sentCookies[cookieId] || sentCookies[cookieId] !== cookie.value) {
       sentCookies[cookieId] = cookie.value;
-      console.log(cookie);
       return true;
     }
     return false;
