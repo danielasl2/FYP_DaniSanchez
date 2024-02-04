@@ -1,106 +1,83 @@
 export const cookieMixin = {
   methods: {
     categorisedCookie(cookie) {
-      /*
-      if (cookie.name.startsWith('httpOnly_')) {
+      // Check for specific cookie properties first
+      if (cookie.httpOnly) {
         return 'HttpOnly Cookies';
       }
-      */
       if (cookie.secure) {
         return 'Secure Cookies';
       }
-      if (cookie.name.includes('sess') || cookie.name.includes('csrftoken')) {
-        return 'Necessary Cookies';
-    }    
-      if (cookie.name.includes('track') || cookie.domain.includes('track')) {
-        return 'Tracking Cookies';
-      }
+  
+      // Categorize based on cookie names and domains
       if (cookie.name.includes('ad') || cookie.domain.includes('ad')) {
-        return 'Advertising Cookies';
+        return 'Advertising';
       }
       if (/ui|pref/.test(cookie.name)) {
         return 'UI and Preferences';
       }
-      if (cookie.name.includes('analytics') || cookie.domain.includes('analytics')) {
-        return 'Performance and Analytics Cookies';
+      if (cookie.domain.includes('.com')) {
+        return 'Commercial Cookies';
       }
-      if (cookie.domain.includes('instagram.com') || cookie.domain.includes('facebook.com') || cookie.domain.includes('twitter.com')) {
-        return 'Social Media Cookies';
+      if (cookie.domain.includes('.org')) {
+        return 'Organizational Cookies';
       }
-      /*
-      if (cookie.name.includes('func') || cookie.domain.includes('func')) {
-        return 'Functional Cookies';
-      }
-      */
-      if (cookie.session) {
+  
+      // Check if the cookie is persistent or session-based
+      if (!('expirationDate' in cookie) || cookie.session) {
         return 'Session Cookies';
       }
-      if (cookie.name.includes('lang') || cookie.name.includes('region')) {
-        return 'Customization Cookies';
-    }
       if ('expirationDate' in cookie) {
         return 'Persistent Cookies';
       }
-      // Fallback category
-      return 'Other Cookies';
+  
+      // Default category
+      return 'General Cookies';
     },
-    getColourForCategory(category) {
-      const colours = {
-        'Advertising Cookies': '#4BBD7E',
-        'Secure Cookies': '#BAD6A3',
-        'Session Cookies': '#F7E7AD',
-        'Persistent Cookies': '#FFBADE',
-        'UI and Preferences': '#9A92D4',
-        'Performance and Analytics Cookies': '#F49FBC',
-      //  'Functional Cookies': '#FDEBA7',
-        'Social Media Cookies': '#8AC6D1',
-       // 'HttpOnly Cookies': '#A4C3B2',
-        'Tracking Cookies': '#E6E6EA',
-        'Necessary Cookies':  '#A4C3B2',
-        'Customization Cookies': '#8AC6D1' ,
-      };
-      return colours[category] || '#000000';
-    }
   },
   computed: {
     categorisedCookies() {
       const categories = {
-        'Advertising Cookies': [],
+        'Advertising': [],
+        'HttpOnly Cookies': [],
         'Secure Cookies': [],
         'Session Cookies': [],
         'Persistent Cookies': [],
         'UI and Preferences': [],
-        'Performance and Analytics Cookies': [],
-       // 'Functional Cookies': [],
-        'Social Media Cookies': [],
-       // 'HttpOnly Cookies': [],
-        'Tracking Cookies': [],
-        'Necessary Cookies': [],
-        'Customization Cookies': [],
+        'Commercial Cookies': [],
+        'Organizational Cookies': [],
+        'General Cookies': [],
       };
       this.filteredCookies.forEach(cookie => {
         const category = this.categorisedCookie(cookie);
-        if (!categories[category]) {
-          categories[category] = [];
-        }
         categories[category].push(cookie);
       });
       return categories;
     },
-    chartData() {
-      const data = {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: [],
-        }]
-      };
-      Object.keys(this.categorisedCookies).forEach(category => {
-        data.labels.push(category);
-        data.datasets[0].data.push(this.categorisedCookies[category].length);
-        data.datasets[0].backgroundColor.push(this.getColourForCategory(category));
-      });
-      return data;
-    }
+    sessionCookies() {
+      return this.cookies.filter(cookie => !cookie.expirationDate);
+    },
+    persistentCookies() {
+      return this.cookies.filter(cookie => cookie.expirationDate);
+    },
+    secureCookies() {
+      return this.cookies.filter(cookie => cookie.secure);
+    },
+    preferencesCookies() {
+      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'UI and Preferences');
+    },
+    loadBalancingCookies() {
+      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'Load Balancing');
+    },
+    userInterfaceCookies() {
+      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'User Interface');
+    },
+    securityCookies() {
+      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'Security');
+    },
+    complianceCookies() {
+      return this.cookies.filter(cookie => this.categorisedCookie(cookie) === 'Compliance');
+    },
+    // ... additional computed properties for other categories
   }
 };

@@ -40,13 +40,6 @@ router.post('/', async (req, res) => {
 
         for (const cookie of cookies) {
             const cookieId = `${cookie.domain}-${cookie.name}`;
-
-            if (!cookie.expirationDate) {
-                cookie.session = true;
-            } else {
-                cookie.session = false;
-            }
-
             let foundCookie = await Cookie.findOne({ identifier: cookieId });
 
             if (foundCookie) {
@@ -54,7 +47,7 @@ router.post('/', async (req, res) => {
                 await foundCookie.save();
                 responses.push({ action: 'updated', cookie: foundCookie });
             } else {
-                const newCookie = new Cookie({ ...cookie, identifier: cookieId, session: cookie.session });
+                const newCookie = new Cookie({ ...cookie, identifier: cookieId });
                 await newCookie.save();
                 responses.push({ action: 'created', cookie: newCookie });
             }
@@ -66,6 +59,5 @@ router.post('/', async (req, res) => {
         res.status(500).send('Error saving cookies');
     }
 });
-
 
 module.exports = router;

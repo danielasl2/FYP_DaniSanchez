@@ -1,18 +1,5 @@
-
-.container {
-  display: flex;
-  justify-content: space-between;
-  width: 600px;
-  height: 800px;
+body {
+    width: 600px; 
+    height: 400px;
+    overflow: auto; 
 }
-
-.chart-container {
-  width: 80%;
-  height: 80%%; 
-}
-
-.list-container {
-  width: 100%; 
-  overflow: auto;
-}
-

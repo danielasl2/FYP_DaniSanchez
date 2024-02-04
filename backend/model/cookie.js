@@ -1,24 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const cookieSchema = new Schema({
+const cookieSchema = new Schema ({
     name: String,
     domain: String,
-    expirationDate: {
-        type: Date,
-        default: null 
-    },
-    session: {
-        type: Boolean,
-        default: false 
-    },
     identifier: String,
+    expirationDate: Date,
     category: String,
     blockedStatus: {
         type: Boolean,
         default: false
     }
-});
+})
 
 const Cookie = mongoose.model('Cookie', cookieSchema);
+
 module.exports = Cookie;
