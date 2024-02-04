@@ -6,12 +6,14 @@ function sendCookiesToServer(cookies) {
       
       cookie.expirationDate = new Date(cookie.expirationDate * 1000);
     }
+    cookie.secure = cookie.secure || false;
     return cookie;
   });
-  const newOrUpdatedCookies = formatExDateCookies.filter(cookie => {
+  const newOrUpdatedCookies = formattedCookies.filter(cookie => {
     const cookieId = `${cookie.domain}-${cookie.name}`;
     if (!sentCookies[cookieId] || sentCookies[cookieId] !== cookie.value) {
       sentCookies[cookieId] = cookie.value;
+      console.log(cookie);
       return true;
     }
     return false;

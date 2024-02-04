@@ -8,6 +8,10 @@ const cookieSchema = new Schema({
         type: Date,
         default: null 
     },
+    secure: {
+        type: Boolean,
+        default: false
+    },
     session: {
         type: Boolean,
         default: false 
