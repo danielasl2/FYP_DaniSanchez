@@ -1,16 +1,12 @@
 <template>
   <div class="container">
     <!-- Navbar -->
-<b-navbar type="dark" variant="light">
-  <b-navbar-brand href="#">Cookies Board</b-navbar-brand>
-  <b-collapse id="nav-collapse" is-nav>
-
-    <b-navbar-nav>
-      <b-nav-item @click="showCookieKey('Key')">Key</b-nav-item>
-    </b-navbar-nav>
-        <b-modal v-model="showKey" title="Cookie Descriptions">
-      <p class="mb-0">{{ currentDescription }}</p>
-        </b-modal>
+    <b-navbar type="dark" variant="light">
+      <b-navbar-brand href="#">Cookies Board</b-navbar-brand>
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav>
+          <b-nav-item @click="toggleKeySection">Key</b-nav-item>
+        </b-navbar-nav>
 
     <b-navbar-nav class="ml-auto">
       <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Analytics</b-nav-item>
@@ -20,6 +16,13 @@
     </b-navbar-nav>
   </b-collapse>
 </b-navbar>
+     <div v-if="showKey" class="key-descriptions">
+      <div v-for="(description, key) in cookieDescriptions" :key="key">
+        <strong>{{ key }}:</strong> {{ description }}<br>
+      </div>
+    </div>
+
+
 
     <!-- Charts Section-->
     <div v-if="showCharts" class="chart-container">
@@ -55,7 +58,7 @@ import axios from 'axios';
 import DoughnutChart from './charts/DoughnutChart.vue';
 import HorizontalBarChart from './charts/HorizontalBChart.vue';
 import BarChart from './charts/BarChart.vue';
-import cookieKey from './CookieKey';
+import {cookieDescriptions} from './cookieDescriptions';
 
 
 export default {
@@ -69,6 +72,8 @@ export default {
   },
   data() {
     return {
+      showKey: false,
+      cookieDescriptions,
       showCharts:false,
       lastUpdateTimestamp: 0,
       updateInterval: 100,
@@ -84,10 +89,8 @@ export default {
     };
   },
   methods: {
-    showCookieKey(key){
-      this.currentKey = cookieKey[key];
-      this.showKey = true;
-      alert(cookieKey[key]);
+    toggleKeySection(){
+      this.showKey =!this.showKey;
     },
     shouldSendUpdate() {
       const now = Date.now();
@@ -241,4 +244,3 @@ export default {
 
 <style scoped>
 </style>
-./CookieKey.js

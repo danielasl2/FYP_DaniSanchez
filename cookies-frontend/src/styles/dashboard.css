@@ -3,7 +3,7 @@
   display: grid;
   grid-template-columns: 1fr; 
   grid-template-rows: auto 1fr; 
-  gap: 0px; /* Remove gap if you don't want space between grid items */
+  gap: 0px;
   padding: 0; 
   width: 570px; 
   height: auto; 
