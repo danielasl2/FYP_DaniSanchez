@@ -17,7 +17,13 @@ export default {
     new Chart(ctx, {
       type: 'bar',
       data: this.chartData,
-      options: {}
+      options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
     });
   }
 };

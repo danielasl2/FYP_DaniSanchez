@@ -20,6 +20,11 @@ export default {
       data: this.chartData,
       options: {
         indexAxis: 'y',
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
       }
     });
   }
