@@ -3,33 +3,31 @@
     <!-- Navbar -->
     <b-navbar type="dark" variant="light">
       <b-navbar-brand href="#">Cookies Board</b-navbar-brand>
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item @click="toggleKeySection">Key</b-nav-item>
         </b-navbar-nav>
+        <b-navbar-nav class="ml-auto">
+          <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Analytics</b-nav-item>
+          <b-nav-form>
+            <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
+          </b-nav-form>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
 
-    <b-navbar-nav class="ml-auto">
-      <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Analytics</b-nav-item>
-      <b-nav-form>
-        <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
-      </b-nav-form>
-    </b-navbar-nav>
-  </b-collapse>
-</b-navbar>
-     <div v-if="showKey" class="key-descriptions">
+    <div v-if="showKey" class="key-descriptions">
       <div v-for="(description, key) in cookieDescriptions" :key="key">
         <strong>{{ key }}:</strong> {{ description }}<br>
       </div>
     </div>
 
-
-
-    <!-- Charts Section-->
+    <!-- Charts Section -->
     <div v-if="showCharts" class="chart-container">
       <doughnut-chart :chart-data="doughnutChartData"></doughnut-chart>
       <horizontal-bar-chart :chart-data="horizontalBarChartData"></horizontal-bar-chart>
       <bar-chart :chart-data="barChartData"></bar-chart>
-
     </div>
 
     <!-- List of Categorised Cookies -->
@@ -48,6 +46,7 @@
     </div>
   </div>
 </template>
+
 
 
 <script>
@@ -73,7 +72,7 @@ export default {
   data() {
     return {
       showKey: false,
-      cookieDescriptions,
+      cookieDescriptions: cookieDescriptions,
       showCharts:false,
       lastUpdateTimestamp: 0,
       updateInterval: 100,
@@ -243,4 +242,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

@@ -8,7 +8,7 @@
   width: 570px; 
   height: auto; 
   overflow: hidden; 
-  margin:  0;
+  margin:  0 auto;
 }
 
 .chart-container, .list-container {
@@ -18,13 +18,28 @@
   padding: 0; 
 }
 
-.navbar-container {
+.navbar-container, .chart-container, .list-container {
   width: 100%; 
   margin: 0; 
   padding: 0; 
 }
-
+.b-navbar {
+  margin-top: 0;
+  padding-top: 0;
+}
+.key-descriptions {
+  padding: 10px;
+}
 .chart-canvas {
   max-height: 400px;
 }
-
+.b-navbar .ml-auto {
+  align-items: right;
+}
+.b-navbar .navbar-nav {
+  align-items: left;
+}
+.key-descriptions{
+  border-top: 1px solid #ccc;
+  padding: 15px;
+}
