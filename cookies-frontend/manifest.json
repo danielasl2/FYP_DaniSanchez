@@ -1,7 +1,7 @@
 {
     "name": "Cookies Dashboard",
     "version": "1.0.0",
-    "description": " This is an extension for cookies",
+    "description": " This is an extension for managing cookies",
     "manifest_version": 3,
     "icons":{
         "16": "icons/16x16.png",
