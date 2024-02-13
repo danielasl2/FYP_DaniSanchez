@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const cookieSchema = new Schema({
+    userId:{
+        type: String,
+        required: true
+    },
     name: String,
     domain: String,
     expirationDate: {
