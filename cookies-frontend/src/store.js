@@ -25,9 +25,10 @@ const store = createStore({
                 console.error('Error fetching cookies:', error);
             }
         },
-        async updateCookieStatus({ commit }, updatedCookie) {
+        async updateCookieStatus({ commit }, {cookieId, blockedStatus}) {
             try {
-                const response = await api.updateCookieStatus(updatedCookie._id, updatedCookie.blockedStatus);
+                const { userId } = await chrome.storage.local.get('userId');
+                const response = await api.updateCookieStatus(cookieId, blockedStatus, userId);
                 commit('UPDATE_COOKIE_STATUS', response.data);
             } catch (error) {
                 console.error('Error updating cookie status:', error);
