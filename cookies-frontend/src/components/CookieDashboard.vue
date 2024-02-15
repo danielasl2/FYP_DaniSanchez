@@ -157,10 +157,6 @@ export default {
     },
   },
   computed: {
-    //added this to access the cookies from the store
-       cookies() {
-        return this.$store.state.cookies; 
-    },
     barChartData() {
     let domainCounts = {};
     this.cookies.forEach(cookie => {
@@ -228,6 +224,10 @@ export default {
         expirationDate: this.formatExpirationDate(cookie.expirationDate),
         type: this.categorisedCookie(cookie)
       }));
+    },
+    //added this to access the cookies from the store
+    allCookies() {
+        return this.$store.state.cookies; 
     },
   },
   mounted() {
