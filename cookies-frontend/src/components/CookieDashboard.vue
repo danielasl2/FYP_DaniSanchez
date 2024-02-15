@@ -89,6 +89,13 @@ export default {
     };
   },
   methods: {
+    async fetchAllCookies(){
+      try{
+        await this.$store.dispatch('fetchCookies');
+      } catch (error){
+        console.error('Error when fetching cookies from  the frontend: ', error);
+      }
+    },
     toggleKeySection(){
       this.showKey =!this.showKey;
     },
@@ -150,6 +157,10 @@ export default {
     },
   },
   computed: {
+    //added this to access the cookies from the store
+       cookies() {
+        return this.$store.state.cookies; 
+    },
     barChartData() {
     let domainCounts = {};
     this.cookies.forEach(cookie => {
@@ -220,7 +231,7 @@ export default {
     },
   },
   mounted() {
-    this.getAllCookies();
+    this.$store.dispatch('fetchCookies'); 
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;
       console.log("Current Domain: ", this.currentDomain);

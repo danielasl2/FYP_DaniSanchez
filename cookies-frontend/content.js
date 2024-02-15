@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener((message) => {
 
         const userId = result.userId;
         const cookiesWithUserId = message.data.cookies.map(cookie => ({ ...cookie, userId }));
+        console.log('Retrived userId in content script: ', userId);
 
 
     fetch('http://localhost:3000/api/cookies', {

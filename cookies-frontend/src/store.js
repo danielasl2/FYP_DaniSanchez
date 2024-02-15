@@ -17,21 +17,12 @@ const store = createStore({
         },
     },
     actions: {
-        async fetchCookies({commit}){
+        async fetchCookies({commit}) {
             try {
-                const response = await api.getCookies();
-                commit('SET_COOKIES', response.data);
+                const response = await api.getCookies(); 
+                commit('SET_COOKIES', response);
             } catch (error) {
                 console.error('Error fetching cookies:', error);
-            }
-        },
-        async updateCookieStatus({ commit }, {cookieId, blockedStatus}) {
-            try {
-                const { userId } = await chrome.storage.local.get('userId');
-                const response = await api.updateCookieStatus(cookieId, blockedStatus, userId);
-                commit('UPDATE_COOKIE_STATUS', response.data);
-            } catch (error) {
-                console.error('Error updating cookie status:', error);
             }
         },
     },

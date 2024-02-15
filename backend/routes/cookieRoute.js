@@ -35,8 +35,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
+      // console.log('Receive cooies: ', req.body.cookies);
         const cookies = req.body.cookies.map(cookie => {
-            if (!cookie.userId) { // Corrected condition
+            if (!cookie.userId) {
                 throw new Error('userId is required for cookie');
             }
             return cookie;
@@ -54,6 +55,7 @@ router.post('/', async (req, res) => {
             } else {
                 const newCookie = new Cookie({ ...cookie, identifier: cookieId, userId: cookie.userId });
                 await newCookie.save();
+            //  console.log('Saved new cookie: ', newCookie)
                 responses.push({ action: 'created', cookie: newCookie });
             }
         }
