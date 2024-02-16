@@ -13,13 +13,28 @@ const store = createStore({
             }
         },
         SET_COOKIES(state, cookies){
-            state.cookies = cookies;
+            state.cookies = cookies
         },
     },
     actions: {
         async fetchCookies({commit}) {
             try {
-                const response = await api.getCookies(); 
+                let userId = null; 
+                if (chrome && chrome.storage) {
+                    userId = await new Promise((resolve, reject) => {
+                        chrome.storage.local.get(['userId'], (result) => {
+                            if (result.userId) {
+                                resolve(result.userId);
+                            } else {
+                                reject('No user ID found');
+                            }
+                        });
+                    });
+                    console.log("Retrieved userId:", userId);
+                }
+    
+                const response = await api.getCookies(userId); 
+                console.log("Fetched cookies:", response);
                 commit('SET_COOKIES', response);
             } catch (error) {
                 console.error('Error fetching cookies:', error);

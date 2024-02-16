@@ -36,7 +36,7 @@
     <div class="list-container">
       <b-list-group>
         <cookie-category
-          v-for="(cookies, category) in categorisedCookies"
+          v-for="(cookies, category) in categorisedCookies(allFromCookies)"
           :key="category"
           :category-name="category"
           :cookies="cookies"
@@ -59,6 +59,7 @@ import DoughnutChart from './charts/DoughnutChart.vue';
 import HorizontalBarChart from './charts/HorizontalBChart.vue';
 import BarChart from './charts/BarChart.vue';
 import {cookieDescriptions} from './cookieDescriptions';
+
 
 
 export default {
@@ -157,7 +158,7 @@ export default {
     },
   },
   computed: {
-    allFromCookies(){
+        allFromCookies(){
       return this.$store.state.cookies;
     },
     barChartData() {
