@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-      // console.log('Receive cooies: ', req.body.cookies);
+       //console.log('Receive cooies: ', req.body.cookies);
         const cookies = req.body.cookies.map(cookie => {
             if (!cookie.userId) {
                 throw new Error('userId is required for cookie');
