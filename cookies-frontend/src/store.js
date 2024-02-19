@@ -18,8 +18,8 @@ const store = createStore({
     },
     actions: {
         async fetchCookies({commit}) {
+            let userId = null; 
             try {
-                let userId = null; 
                 if (chrome && chrome.storage) {
                     userId = await new Promise((resolve, reject) => {
                         chrome.storage.local.get(['userId'], (result) => {
@@ -30,7 +30,7 @@ const store = createStore({
                             }
                         });
                     });
-                    console.log("Retrieved userId:", userId);
+                   // console.log("Retrieved userId:", userId);
                 }
     
                 const response = await api.getCookies(userId); 

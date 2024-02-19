@@ -36,7 +36,7 @@
     <div class="list-container">
       <b-list-group>
         <cookie-category
-          v-for="(cookies, category) in categorisedCookies(allFromCookies)"
+          v-for="(cookies, category) in allFromCookies"
           :key="category"
           :category-name="category"
           :cookies="cookies"
