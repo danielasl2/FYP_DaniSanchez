@@ -51,7 +51,9 @@
 
 
 <script>
-import { cookieMixin } from '../mixin/cookieMix';
+import { computed } from 'vue';
+import {useStore} from 'vuex';
+import { cookieMix } from '../mixin/cookieMix';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
@@ -64,12 +66,19 @@ import {cookieDescriptions} from './cookieDescriptions';
 
 export default {
   name: 'CookieKey',
-  mixins: [cookieMixin],
+  mixins: [cookieMix],
   components: {
     CookieCategory,
     DoughnutChart,
     HorizontalBarChart,
     BarChart
+  },
+  setup(){
+    const store = useStore();
+    const vuexCookies = computed(() => store.state.vuexCookies);
+    return{
+      vuexCookies
+    };
   },
   data() {
     return {
@@ -231,7 +240,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('fetchCookies'); 
+    this.fetchAllCookies();
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;
       console.log("Current Domain: ", this.currentDomain);

@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import api from './api';
-import { cookieMixin} from './mixin/cookieMix'
+import { cookieUtil} from './mixin/cookieUtil';
 
 const store = createStore({
     state: {
@@ -8,19 +8,21 @@ const store = createStore({
     },
     mutations: {
         UPDATE_COOKIE_STATUS(state, updatedCookie) {
-            const category = cookieMixin(updatedCookie);
+            const category = cookieUtil.categorisedCookie(updatedCookie);
             const index = state.cookies[category]?.findIndex(cookie => cookie._id === updatedCookie._id);
             if (index !== -1) {
                 state.cookies[category][index] = updatedCookie;
             }
         },
         SET_COOKIES(state, cookieMix){
+            console.log('Updating cookies in the store ', cookieMix)
             state.cookies = cookieMix;
         },
     },
     actions: {
         async fetchCookies({commit}) {
             let userId = null; 
+            console.log('Fetching cookies for user:', userId);  
             try {
                 if (chrome && chrome.storage) {
                     userId = await new Promise((resolve, reject) => {
@@ -32,14 +34,15 @@ const store = createStore({
                             }
                         });
                     });
-                   // console.log("Retrieved userId:", userId);
+                   console.log("Retrieved userId:", userId);
                 }
     
                 const rawCookies = await api.getCookies(userId); 
+                console.log('Raw cookies received:', rawCookies);
                 const cookieMix= {};
 
                 rawCookies.forEach(cookie => {
-                    const category = cookieMixin(cookie);
+                    const category = cookieUtil.categorisedCookie(cookie);
                     if(! cookieMix[category]){
                         cookieMix[category] = [];
                     }

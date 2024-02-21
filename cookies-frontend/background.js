@@ -17,7 +17,7 @@ function sendCookiesToServer(cookies) {
           userId = generateUUID();
           chrome.storage.local.set({userId: userId});
       }
-      console.log("Retrieved userId:", userId);
+      //console.log("Retrieved userId:", userId);
       const formattedCookies = cookies.map(cookie => ({
           ...cookie,
           userId,
