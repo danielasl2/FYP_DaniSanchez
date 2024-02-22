@@ -15,7 +15,7 @@ const store = createStore({
             }
         },
         SET_COOKIES(state, cookieMix){
-            console.log('Updating cookies in the store ', cookieMix)
+           // console.log('Updating cookies in the store ', cookieMix)
             state.cookies = cookieMix;
         },
     },
@@ -34,7 +34,7 @@ const store = createStore({
                             }
                         });
                     });
-                   console.log("Retrieved userId:", userId);
+                //   console.log("Retrieved userId:", userId);
                 }
     
                 const rawCookies = await api.getCookies(userId); 
@@ -53,6 +53,45 @@ const store = createStore({
             } catch (error) {
                 console.error('Error fetching cookies:', error);
             }
+        },
+        async blockUnblockCookie({ commit }, { cookieId, blockedStatus, userId }) {
+            console.log(`Vuex action received - Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
+            try {
+              const updatedCookie = await api.updateCookieStatus(cookieId, blockedStatus, userId);
+              commit('UPDATE_COOKIE_STATUS', updatedCookie);
+            } catch (error) {
+              console.error('Error blocking/unblocking cookie:', error);
+            }
+          }
+    },
+    methods:{
+        async toggleBlockStatus(cookie) {
+            try {
+              const userId = await this.getUserID(); 
+              console.log(`Toggling block status for cookie ID: ${cookie._id}, User ID: ${userId}`); 
+              if (!userId) {
+                console.error('No user ID found for blocking/unblocking cookies');
+                return;
+              }
+              this.$store.dispatch('blockUnblockCookie', {
+                cookieId: cookie._id,
+                blockedStatus: !cookie.blockedStatus, 
+                userId: userId
+              });
+            } catch (error) {
+              console.error('Error toggling cookie status:', error);
+            }
+          },
+          getUserID() {
+            return new Promise((resolve) => {
+              if (chrome && chrome.storage) {
+                chrome.storage.local.get(['userId'], (result) => {
+                  resolve(result.userId || null);
+                });
+              } else {
+                resolve(null); 
+              }
+            });
         },
     },
 });

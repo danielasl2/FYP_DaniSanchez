@@ -2,13 +2,16 @@ chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "displayCookies") {
     console.log("Received cookies in content script:", message.data.cookies); 
 
+    //getting the user id here
     chrome.storage.local.get('userId', (result) => {
       if(result.userId) {
 
+        console.log("Retrived userId for API call: ", result.userId);
         const userId = result.userId;
         const cookiesWithUserId = message.data.cookies.map(cookie => ({ ...cookie, userId }));
-        console.log('Retrived userId in content script: ', userId);
+     //   console.log('Retrived userId in content script: ', userId);
 
+     //verigying that the user id is send with the respective cookies
 
     fetch('http://localhost:3000/api/cookies', {
       method: 'POST',
@@ -18,10 +21,12 @@ chrome.runtime.onMessage.addListener((message) => {
     .then(response => response.json())
     .then(data => console.log("Response from server:", data)) 
     .catch(error => console.error('Error:', error));
-
-    window.postMessage({ type: "FROM_EXTENSION", action: "displayCookies", data: message.data }, "*");
+  }
+  else {
+    console.log("No userid found");
   }
 });
+    window.postMessage({ type: "FROM_EXTENSION", action: "displayCookies", data: message.data }, "*");
   }
 });
 
