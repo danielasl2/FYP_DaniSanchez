@@ -1,10 +1,5 @@
 export const cookieUtil =  {
     categorisedCookie(cookie) {
-      /*
-      if (cookie.name.startsWith('httpOnly_')) {
-        return 'HttpOnly Cookies';
-      }
-      */
       if (cookie.secure) {
         return 'Secure Cookies';
       }
@@ -26,11 +21,6 @@ export const cookieUtil =  {
       if (cookie.domain.includes('instagram.com') || cookie.domain.includes('facebook.com') || cookie.domain.includes('twitter.com')) {
         return 'Social Media Cookies';
       }
-      /*
-      if (cookie.name.includes('func') || cookie.domain.includes('func')) {
-        return 'Functional Cookies';
-      }
-      */
       if (cookie.session) {
         return 'Session Cookies';
       }
@@ -51,9 +41,7 @@ export const cookieUtil =  {
         'Persistent Cookies': '#FFBADE',
         'UI and Preferences': '#9A92D4',
         'Performance and Analytics Cookies': '#F49FBC',
-      //  'Functional Cookies': '#FDEBA7',
         'Social Media Cookies': '#8AC6D1',
-       // 'HttpOnly Cookies': '#A4C3B2',
         'Tracking Cookies': '#E6E6EA',
         'Necessary Cookies':  '#A4C3B2',
         'Customization Cookies': '#8AC6D1' ,

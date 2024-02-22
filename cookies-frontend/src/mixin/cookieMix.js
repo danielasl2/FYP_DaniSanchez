@@ -1,11 +1,10 @@
 export const cookieMix= {
   methods: {
+    /*
     categorisedCookie(cookie) {
-      /*
       if (cookie.name.startsWith('httpOnly_')) {
         return 'HttpOnly Cookies';
       }
-      */
       if (cookie.secure) {
         return 'Secure Cookies';
       }
@@ -27,11 +26,9 @@ export const cookieMix= {
       if (cookie.domain.includes('instagram.com') || cookie.domain.includes('facebook.com') || cookie.domain.includes('twitter.com')) {
         return 'Social Media Cookies';
       }
-      /*
       if (cookie.name.includes('func') || cookie.domain.includes('func')) {
         return 'Functional Cookies';
       }
-      */
       if (cookie.session) {
         return 'Session Cookies';
       }
@@ -60,9 +57,10 @@ export const cookieMix= {
         'Customization Cookies': '#8AC6D1' ,
       };
       return colours[category] || '#000000';
-    }
+      */
   },
-  computed: {
+  computed: 
+  {
     categorisedCookies() {
       const categories = {
         'Advertising Cookies': [],

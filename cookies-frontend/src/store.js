@@ -4,7 +4,8 @@ import { cookieUtil} from './mixin/cookieUtil';
 
 const store = createStore({
     state: {
-        cookies: {}
+        cookies: {},
+        userId: null,
     },
     mutations: {
         UPDATE_COOKIE_STATUS(state, updatedCookie) {
@@ -18,6 +19,9 @@ const store = createStore({
            // console.log('Updating cookies in the store ', cookieMix)
             state.cookies = cookieMix;
         },
+        SET_USER_ID(state, userId) {  
+          state.userId = userId;
+      },
     },
     actions: {
         async fetchCookies({commit}) {
@@ -55,14 +59,30 @@ const store = createStore({
             }
         },
         async blockUnblockCookie({ commit }, { cookieId, blockedStatus, userId }) {
-            console.log(`Vuex action received - Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
+            console.log(`Attempting to update: Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
             try {
-              const updatedCookie = await api.updateCookieStatus(cookieId, blockedStatus, userId);
-              commit('UPDATE_COOKIE_STATUS', updatedCookie);
+              const response = await api.updateCookieStatus(cookieId, blockedStatus, userId);
+              commit('UPDATE_COOKIE_STATUS', response.data);
             } catch (error) {
               console.error('Error blocking/unblocking cookie:', error);
             }
-          }
+          },
+          fetchUserId({commit}){
+            return new Promise((resolve, reject) => {
+            if (chrome && chrome.storage){
+              chrome.storage.local.get( ['userId'], (result) => {
+                if (result.userId) {
+                  commit('SET_USER_ID', result.userId);
+                  resolve(result.userId);
+                } else {
+                  reject('No user ID found');
+              }
+              });
+            } else {
+              reject('Chrome storage is not accessible');
+            }
+          });
+        }
     },
     methods:{
         async toggleBlockStatus(cookie) {

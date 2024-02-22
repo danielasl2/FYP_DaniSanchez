@@ -131,14 +131,18 @@ export default {
       this.cookies = Object.values(this.allCookies);
     },
     formatExpirationDate,
-    async handleBlockStatusUpdate(updatedCookie) {
-      try {
-        await axios.patch(`http://localhost:3000/api/cookies/block/${updatedCookie._id}`, {
-          blockedStatus: !updatedCookie.blockedStatus
+    async handleBlockStatusUpdate(cookie) {
+       const userId = this.$store.state.userId;
+
+        if (!userId) {
+            console.error('User ID is missing');
+            return;
+        }
+        this.$store.dispatch('blockUnblockCookie', {
+            cookieId: cookie._id,
+            blockedStatus: !cookie.blockedStatus,
+            userId: userId
         });
-      } catch (error) {
-        console.error('Error updating cookie status:', error);
-      }
     },
     async getAllCookies() {
       if (this.shouldSendUpdate()) {
@@ -167,6 +171,9 @@ export default {
     },
   },
   computed: {
+    userId(){
+      return this.$store.state.userId;
+    },
         allFromCookies(){
       return this.$store.state.cookies;
     },
@@ -239,7 +246,15 @@ export default {
       }));
     },
   },
+  watch: {
+    userId(newUserId, oldUserId) {
+    if (newUserId !== oldUserId) {
+      this.fetchAllCookies();
+    }
+  },
+  },
   mounted() {
+      this.$store.dispatch('fetchUserId');
     this.fetchAllCookies();
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;

@@ -4,23 +4,23 @@ const Cookie = require('../model/cookie');
 
 
 router.patch('/block/:id', async (req, res) => {
-    try {
-        const cookieId = req.params.id;
-        const { blockedStatus, userId } = req.body;
+    const { id } = req.params;
+    const { blockedStatus, userId } = req.body;
 
-        console.log(`Received cookieId: ${cookieId}, userId: ${userId}`);
-        const cookie = await Cookie.findOne({ _id: cookieId, userId: userId });
+    console.log(`Backend received: Cookie ID: ${id}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);  // Confirm data is received correctly
+
+    try {
+        const cookie = await Cookie.findOne({ _id: id, userId });
         if (!cookie) {
-            return res.status(404).send('Cookie not found or you can\'t change it');
+            return res.status(404).send('Cookie not found or you cannot change it');
         }
-        
+
         cookie.blockedStatus = blockedStatus;
-        const updatedCookie = await cookie.save(); 
-            
-        res.status(200).json(updatedCookie);
+        await cookie.save();
+        res.json(cookie);  
     } catch (error) {
-        console.error(`Error updating cookie: ${error}`);
-        res.status(500).json({ message: error.toString()});
+        console.error(`Error updating cookie status: ${error}`);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
