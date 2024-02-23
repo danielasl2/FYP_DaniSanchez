@@ -2,6 +2,25 @@ import { createStore } from 'vuex';
 import api from './api';
 import { cookieUtil} from './mixin/cookieUtil';
 
+//formating date here since changed the categorisation method now the date is not reading from the utils
+function formatCookieDate(dateString){
+ // console.log("Original seconds:", dateString);
+  if(!dateString) return 'N/A';
+
+  const date = new Date(dateString);
+//  console.log("Converted Date object:", date);
+
+  if (isNaN(date.getTime())) {
+ //   console.log("Invalid Date for input:", dateString);
+    return 'Invalid date'; 
+}
+const day = ("0" + date.getDate()).slice(-2); 
+const month = ("0" + (date.getMonth() + 1)).slice(-2);
+const year = date.getFullYear();
+
+return `${day}/${month}/${year}`;
+}
+
 const store = createStore({
     state: {
         cookies: {},
@@ -50,6 +69,7 @@ const store = createStore({
                     if(! cookieMix[category]){
                         cookieMix[category] = [];
                     }
+                    cookie.expirationDate = formatCookieDate(cookie.expirationDate);
                     cookieMix[category].push(cookie);
                 })
                // console.log("Fetched cookies:", response);

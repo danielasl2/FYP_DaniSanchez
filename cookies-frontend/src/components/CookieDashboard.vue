@@ -121,7 +121,7 @@ export default {
       newCookies.forEach(cookie => {
         const formattedCookie = {
           ...cookie,
-          expirationDate: this.formatExpirationDate(cookie.expirationDate)
+          expirationDate: formatExpirationDate(cookie.expirationDate)
         };
 
         const cookieId = `${cookie.domain}-${cookie.name}`; 
@@ -241,7 +241,7 @@ export default {
     formattedCookies() {
       return this.cookies.map(cookie => ({
         ...cookie,
-        expirationDate: this.formatExpirationDate(cookie.expirationDate),
+        expirationDate: formatExpirationDate(cookie.expirationDate),
         type: this.categorisedCookie(cookie)
       }));
     },
@@ -254,7 +254,7 @@ export default {
   },
   },
   mounted() {
-      this.$store.dispatch('fetchUserId');
+    this.$store.dispatch('fetchUserId');
     this.fetchAllCookies();
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;
@@ -262,6 +262,8 @@ export default {
     }).catch(error => {
       console.error('Error', error);
     });
+
+  //  console.log("Test fucntion formatExpirationDate: ", formatExpirationDate('2024-04-27T10:58:13.312Z'));
   },
   created() {
     window.addEventListener("message", (event) => {
