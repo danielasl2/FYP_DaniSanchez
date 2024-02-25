@@ -1,6 +1,11 @@
+import { cookieUtil } from './cookieUtil';
+
 export const cookieMix= {
   computed: 
   {
+    userId(){
+      return this.$store.state.userId;
+    },
     categorisedCookies() {
       const categories = {
         'Advertising Cookies': [],
@@ -9,15 +14,14 @@ export const cookieMix= {
         'Persistent Cookies': [],
         'UI and Preferences': [],
         'Performance and Analytics Cookies': [],
-       // 'Functional Cookies': [],
         'Social Media Cookies': [],
-       // 'HttpOnly Cookies': [],
         'Tracking Cookies': [],
         'Necessary Cookies': [],
         'Customization Cookies': [],
       };
+     // console.log("Filtered Cookies: ", cookieUtil.filteredCookies);
       this.filteredCookies.forEach(cookie => {
-        const category = this.categorisedCookie(cookie);
+        const category = cookieUtil.categorisedCookie(cookie);
         if (!categories[category]) {
           categories[category] = [];
         }

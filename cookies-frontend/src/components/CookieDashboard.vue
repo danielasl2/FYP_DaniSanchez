@@ -11,7 +11,7 @@
     <b-navbar-nav class="ml-auto">
       <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Analytics</b-nav-item>
       <b-nav-form>
-        <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
+        <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search Website"></b-form-input>
       </b-nav-form>
     </b-navbar-nav>
   </b-collapse>
@@ -36,7 +36,7 @@
     <div class="list-container">
       <b-list-group>
         <cookie-category
-          v-for="(cookies, category) in allFromCookies"
+          v-for="(cookies, category) in filteredCookies"
           :key="category"
           :category-name="category"
           :cookies="cookies"
@@ -233,10 +233,17 @@ export default {
     };
   },
     filteredCookies() {
-      if (!this.filterDomain) {
-        return this.cookies;
+      if (!this.filterDomain.trim()) {
+      return this.allFromCookies;
+    }
+    let filtered = {};
+    Object.entries(this.allFromCookies).forEach(([category, cookies]) => {
+      let filteredCookies = cookies.filter(cookie => cookie.domain.toLowerCase().includes(this.filterDomain.toLowerCase()));
+      if (filteredCookies.length > 0) {
+        filtered[category] = filteredCookies;
       }
-      return this.cookies.filter(cookie => cookie.domain && cookie.domain.includes(this.filterDomain.toLowerCase()));
+    });
+    return filtered;
     },
     formattedCookies() {
       return this.cookies.map(cookie => ({

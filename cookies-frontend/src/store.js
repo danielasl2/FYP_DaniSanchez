@@ -23,13 +23,20 @@ return `${day}/${month}/${year}`;
 
 const store = createStore({
     state: {
-        cookies: {},
+        cookies: [],
         userId: null,
     },
     mutations: {
         UPDATE_COOKIE_STATUS(state, updatedCookie) {
+
             const category = cookieUtil.categorisedCookie(updatedCookie);
-            const index = state.cookies[category]?.findIndex(cookie => cookie._id === updatedCookie._id);
+
+            if (!state.cookies[category]) {
+                state.cookies[category] = [];
+            }
+
+            const index = state.cookies[category].findIndex(cookie => cookie._id === updatedCookie._id);
+
             if (index !== -1) {
                 state.cookies[category][index] = updatedCookie;
             }
@@ -104,37 +111,40 @@ const store = createStore({
           });
         }
     },
-    methods:{
-        async toggleBlockStatus(cookie) {
-            try {
-              const userId = await this.getUserID(); 
-              console.log(`Toggling block status for cookie ID: ${cookie._id}, User ID: ${userId}`); 
-              if (!userId) {
-                console.error('No user ID found for blocking/unblocking cookies');
-                return;
-              }
-              this.$store.dispatch('blockUnblockCookie', {
-                cookieId: cookie._id,
-                blockedStatus: !cookie.blockedStatus, 
-                userId: userId
-              });
-            } catch (error) {
-              console.error('Error toggling cookie status:', error);
-            }
-          },
-          getUserID() {
-            return new Promise((resolve) => {
-              if (chrome && chrome.storage) {
-                chrome.storage.local.get(['userId'], (result) => {
-                  resolve(result.userId || null);
-                });
-              } else {
-                resolve(null); 
-              }
+    async toggleBlockStatus({ dispatch, state }, cookie) {
+      try {
+          const userId = state.userId; 
+          if (!userId) {
+              console.error('No user ID found for blocking/unblocking cookies');
+              return;
+          }
+          await dispatch('blockUnblockCookie', {
+              cookieId: cookie._id,
+              blockedStatus: !cookie.blockedStatus, 
+              userId: userId
+          });
+      } catch (error) {
+          console.error('Error toggling cookie status:', error);
+      }
+  },
+          fetchUserID({commit}) {
+            return new Promise((resolve, reject) => {
+                if (chrome && chrome.storage) {
+                    chrome.storage.local.get(['userId'], (result) => {
+                        if (result.userId) {
+                            commit('SET_USER_ID', result.userId);
+                            resolve(result.userId);
+                        } else {
+                            reject('No user ID found');
+                        }
+                    });
+                } else {
+                    reject('Chrome storage is not accessible');
+                }
             });
         },
     },
-});
+);
 
 export default store;
 

@@ -1,5 +1,6 @@
 export const cookieUtil =  {
     categorisedCookie(cookie) {
+      if (!cookie) return 'Unknown Category';
       if (cookie.secure) {
         return 'Secure Cookies';
       }
