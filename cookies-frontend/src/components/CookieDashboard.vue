@@ -109,9 +109,7 @@ export default {
         const fetchedCookies = this.vuexCookie.cookies; 
         if (Array.isArray(fetchedCookies)) {
       this.handleCookiesReceived(fetchedCookies);
-    } else {
-      console.error('Fetched cookies is not an array:', fetchedCookies);
-    }
+    } 
   } catch (error) {
     console.error('Error when fetching cookies from the frontend:', error);
   }
@@ -139,8 +137,6 @@ export default {
       this.allCookies[cookieId] = formattedCookie;
     });
     this.cookies = Object.values(this.allCookies); 
-  } else {
-    console.error('newCookies is not an array:', newCookies);
   }
 },
     formatExpirationDate,
