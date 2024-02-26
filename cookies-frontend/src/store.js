@@ -4,8 +4,13 @@ import { cookieUtil} from './mixin/cookieUtil';
 
 //formating date here since changed the categorisation method now the date is not reading from the utils
 function formatCookieDate(dateString){
-  if(!dateString) return 'N/A';
+  if(!dateString|| dateString === 'N/A') return 'N/A';
 
+  let parts = dateString.split('/');
+  if (parts.length === 3) {
+    dateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  
   const date = new Date(dateString);
 
   if (isNaN(date.getTime())) {
