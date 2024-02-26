@@ -1,7 +1,7 @@
 <template>
   <div>
     <canvas ref="chartCanvas"></canvas>
-    <h7>Distribution of Cookies for different Categories</h7>
+    <div class="chart-title">Distribution of Cookies by Category</div>
   </div>
 </template>
 

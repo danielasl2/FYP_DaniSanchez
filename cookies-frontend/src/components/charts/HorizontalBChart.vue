@@ -13,6 +13,14 @@ export default {
   props: {
     chartData: Object
   },
+    watch: {
+    chartData(newData, oldData) {
+      if (this.chart && newData !== oldData) {
+        this.chart.data = newData;
+        this.chart.update();
+      }
+    }
+  },
   mounted() {
     const ctx = this.$refs.horizontalBarChartCanvas.getContext('2d');
     new Chart(ctx, {

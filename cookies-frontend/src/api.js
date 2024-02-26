@@ -11,11 +11,6 @@ const api = {
     },
     updateCookieStatus(cookieId, blockedStatus, userId) {
         console.log(`Sending request to update status for: Cookie ID: ${cookieId}, User ID: ${userId}`);
-        /*
-        console.log('Update cookie function is called');
-        console.log('this is the user id: ', userId);
-        return axios.patch(`${API_URL}/api/cookies/block/${cookieId}`, { blockedStatus, userId });
-        */
         return axios.patch(`${API_URL}/api/cookies/block/${cookieId}`, {
             blockedStatus,
             userId

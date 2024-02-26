@@ -4,14 +4,12 @@ import { cookieUtil} from './mixin/cookieUtil';
 
 //formating date here since changed the categorisation method now the date is not reading from the utils
 function formatCookieDate(dateString){
- // console.log("Original seconds:", dateString);
   if(!dateString) return 'N/A';
 
   const date = new Date(dateString);
-//  console.log("Converted Date object:", date);
 
   if (isNaN(date.getTime())) {
- //   console.log("Invalid Date for input:", dateString);
+    console.error('Invalid Date:', dateString);
     return 'Invalid date'; 
 }
 const day = ("0" + date.getDate()).slice(-2); 
@@ -23,28 +21,34 @@ return `${day}/${month}/${year}`;
 
 const store = createStore({
     state: {
-        cookies: [],
+        cookies: {},
         userId: null,
     },
     mutations: {
-        UPDATE_COOKIE_STATUS(state, updatedCookie) {
+        UPDATE_COOKIE_STATUS(state, { category, updatedCookie }) {
 
-            const category = cookieUtil.categorisedCookie(updatedCookie);
-
-            if (!state.cookies[category]) {
-                state.cookies[category] = [];
-            }
-
-            const index = state.cookies[category].findIndex(cookie => cookie._id === updatedCookie._id);
-
-            if (index !== -1) {
-                state.cookies[category][index] = updatedCookie;
+            if (state.cookies[category]) {
+                const index = state.cookies[category].findIndex(cookie => cookie._id === updatedCookie._id);
+                if (index !== -1) {
+                    state.cookies[category][index] = updatedCookie;
+                }
             }
         },
-        SET_COOKIES(state, cookieMix){
-           // console.log('Updating cookies in the store ', cookieMix)
-            state.cookies = cookieMix;
+        SET_COOKIES(state, rawCookies) {
+            const categorizedCookies = {};
+            rawCookies.forEach(cookie => {
+                const category = cookieUtil.categorisedCookie(cookie);
+                if (!categorizedCookies[category]) {
+                    categorizedCookies[category] = [];
+                }
+                categorizedCookies[category].push({
+                    ...cookie,
+                    expirationDate: formatCookieDate(cookie.expirationDate)
+                });
+            });
+            state.cookies = categorizedCookies;
         },
+    
         SET_USER_ID(state, userId) {  
           state.userId = userId;
       },
@@ -52,7 +56,7 @@ const store = createStore({
     actions: {
         async fetchCookies({commit}) {
             let userId = null; 
-            console.log('Fetching cookies for user:', userId);  
+
             try {
                 if (chrome && chrome.storage) {
                     userId = await new Promise((resolve, reject) => {
@@ -64,23 +68,17 @@ const store = createStore({
                             }
                         });
                     });
-                //   console.log("Retrieved userId:", userId);
                 }
     
-                const rawCookies = await api.getCookies(userId); 
-                console.log('Raw cookies received:', rawCookies);
-                const cookieMix= {};
-
-                rawCookies.forEach(cookie => {
-                    const category = cookieUtil.categorisedCookie(cookie);
-                    if(! cookieMix[category]){
-                        cookieMix[category] = [];
-                    }
-                    cookie.expirationDate = formatCookieDate(cookie.expirationDate);
-                    cookieMix[category].push(cookie);
-                })
-               // console.log("Fetched cookies:", response);
-                commit('SET_COOKIES', cookieMix);
+                const rawCookies = await api.getCookies(userId);
+                const categorizedCookies = rawCookies.map(cookie => ({
+                  ...cookie,
+                  category: cookieUtil.categorisedCookie(cookie),
+                  expirationDate: formatCookieDate(cookie.expirationDate),
+                }));
+        
+                console.log("Processed cookie for vuex:", categorizedCookies);
+                commit('SET_COOKIES', categorizedCookies);
             } catch (error) {
                 console.error('Error fetching cookies:', error);
             }
@@ -143,10 +141,21 @@ const store = createStore({
                 }
             });
         },
+    getters: {
+        chartData: (state) => {
+            return Object.keys(state.cookies).map( category => ({
+                category: category,
+                count: state.cookies[category].length
+            })
+
+            )
+        },
+        categorizedCookies: (state) => {
+            return state.cookies;
+        }
+    }
     },
 );
 
 export default store;
-
-
   
