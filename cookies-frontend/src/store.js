@@ -1,42 +1,161 @@
 import { createStore } from 'vuex';
 import api from './api';
+import { cookieUtil} from './mixin/cookieUtil';
+
+//formating date here since changed the categorisation method now the date is not reading from the utils
+function formatCookieDate(dateString){
+  if(!dateString) return 'N/A';
+
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    console.error('Invalid Date:', dateString);
+    return 'Invalid date'; 
+}
+const day = ("0" + date.getDate()).slice(-2); 
+const month = ("0" + (date.getMonth() + 1)).slice(-2);
+const year = date.getFullYear();
+
+return `${day}/${month}/${year}`;
+}
 
 const store = createStore({
     state: {
-        cookies: []
+        cookies: {},
+        userId: null,
     },
     mutations: {
-        UPDATE_COOKIE_STATUS(state, updatedCookie) {
-            const index = state.cookies.findIndex(cookie => cookie._id === updatedCookie._id);
-            if (index !== -1) {
-                state.cookies.splice(index, 1, updatedCookie);
+        UPDATE_COOKIE_STATUS(state, { category, updatedCookie }) {
+
+            if (state.cookies[category]) {
+                const index = state.cookies[category].findIndex(cookie => cookie._id === updatedCookie._id);
+                if (index !== -1) {
+                    state.cookies[category][index] = updatedCookie;
+                }
             }
         },
-        SET_COOKIES(state, cookies){
-            state.cookies = cookies;
+        SET_COOKIES(state, rawCookies) {
+            const categorizedCookies = {};
+            rawCookies.forEach(cookie => {
+                const category = cookieUtil.categorisedCookie(cookie);
+                if (!categorizedCookies[category]) {
+                    categorizedCookies[category] = [];
+                }
+                categorizedCookies[category].push({
+                    ...cookie,
+                    expirationDate: formatCookieDate(cookie.expirationDate)
+                });
+            });
+            state.cookies = categorizedCookies;
         },
+    
+        SET_USER_ID(state, userId) {  
+          state.userId = userId;
+      },
     },
     actions: {
-        async fetchCookies({commit}){
+        async fetchCookies({commit}) {
+            let userId = null; 
+
             try {
-                const response = await api.getCookies();
-                commit('SET_COOKIES', response.data);
+                if (chrome && chrome.storage) {
+                    userId = await new Promise((resolve, reject) => {
+                        chrome.storage.local.get(['userId'], (result) => {
+                            if (result.userId) {
+                                resolve(result.userId);
+                            } else {
+                                reject('No user ID found');
+                            }
+                        });
+                    });
+                }
+    
+                const rawCookies = await api.getCookies(userId);
+                const categorizedCookies = rawCookies.map(cookie => ({
+                  ...cookie,
+                  category: cookieUtil.categorisedCookie(cookie),
+                  expirationDate: formatCookieDate(cookie.expirationDate),
+                }));
+        
+                console.log("Processed cookie for vuex:", categorizedCookies);
+                commit('SET_COOKIES', categorizedCookies);
             } catch (error) {
                 console.error('Error fetching cookies:', error);
             }
         },
-        async updateCookieStatus({ commit }, updatedCookie) {
+        async blockUnblockCookie({ commit }, { cookieId, blockedStatus, userId }) {
+            console.log(`Attempting to update: Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
             try {
-                const response = await api.updateCookieStatus(updatedCookie._id, updatedCookie.blockedStatus);
-                commit('UPDATE_COOKIE_STATUS', response.data);
+              const response = await api.updateCookieStatus(cookieId, blockedStatus, userId);
+              commit('UPDATE_COOKIE_STATUS', response.data);
             } catch (error) {
-                console.error('Error updating cookie status:', error);
+              console.error('Error blocking/unblocking cookie:', error);
             }
-        },
+          },
+          fetchUserId({commit}){
+            return new Promise((resolve, reject) => {
+            if (chrome && chrome.storage){
+              chrome.storage.local.get( ['userId'], (result) => {
+                if (result.userId) {
+                  commit('SET_USER_ID', result.userId);
+                  resolve(result.userId);
+                } else {
+                  reject('No user ID found');
+              }
+              });
+            } else {
+              reject('Chrome storage is not accessible');
+            }
+          });
+        }
     },
-});
+    async toggleBlockStatus({ dispatch, state }, cookie) {
+      try {
+          const userId = state.userId; 
+          if (!userId) {
+              console.error('No user ID found for blocking/unblocking cookies');
+              return;
+          }
+          await dispatch('blockUnblockCookie', {
+              cookieId: cookie._id,
+              blockedStatus: !cookie.blockedStatus, 
+              userId: userId
+          });
+      } catch (error) {
+          console.error('Error toggling cookie status:', error);
+      }
+  },
+          fetchUserID({commit}) {
+            return new Promise((resolve, reject) => {
+                if (chrome && chrome.storage) {
+                    chrome.storage.local.get(['userId'], (result) => {
+                        if (result.userId) {
+                            commit('SET_USER_ID', result.userId);
+                            resolve(result.userId);
+                        } else {
+                            reject('No user ID found');
+                        }
+                    });
+                } else {
+                    reject('Chrome storage is not accessible');
+                }
+            });
+        },
+    getters: {
+        chartData: (state) => {
+            return Object.keys(state.cookies).map( category => ({
+                category: category,
+                count: state.cookies[category].length
+            })
+
+            )
+        },
+        categorizedCookies: (state) => {
+            return state.cookies;
+        }
+    }
+    },
+);
 
 export default store;
-
-
   

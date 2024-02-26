@@ -10,7 +10,6 @@
   overflow: hidden; 
   margin:  0;
 }
-
 .chart-container, .list-container {
   width: 100%;
   overflow: auto; 

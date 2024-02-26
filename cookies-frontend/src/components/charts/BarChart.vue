@@ -12,9 +12,22 @@ export default {
   props: {
     chartData: Object
   },
+  watch: {
+    chartData(newData, oldData) {
+      if (this.chart && newData !== oldData) {
+        this.chart.data = newData;
+        this.chart.update();
+      }
+    }
+  },
   mounted() {
+  this.renderChart();
+},
+
+methods:  {
+  renderChart(){
     const ctx = this.$refs.barChartCanvas.getContext('2d');
-    new Chart(ctx, {
+    this.chart = new Chart(ctx, {
       type: 'bar',
       data: this.chartData,
       options: {
@@ -26,5 +39,6 @@ export default {
       }
     });
   }
-};
+}
+}
 </script>

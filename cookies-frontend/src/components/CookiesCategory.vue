@@ -5,11 +5,17 @@
     </b-list-group-item>
     <b-collapse :id="collapseId" v-model="isCollapsed">
       <b-card>
-        <b-table :items="cookies" :fields="cookieFields">
+  <div v-if="cookies.length > 0">
+    <b-table :items="cookies" :fields="cookieFields">
           <template #cell(blockToggle)="data">
             <input type="checkbox" v-model="data.item.blockedStatus" @change="toggleBlockStatus(data.item)">
           </template>
         </b-table>
+        </div>
+  <div v-else>
+    No cookies available.
+  </div>
+
       </b-card>
     </b-collapse>
   </div>
@@ -27,6 +33,11 @@ export default {
     return {
       isCollapsed: false
     };
+  },
+  computed: {
+    storedCookies() {
+      return this.$store.state.cookies; 
+    }
   },
   methods: {
     toggleCollapse() {

@@ -3,12 +3,25 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3000';
 
 const api = {
-    getCookies() {
-        return axios.get(`${API_URL}/api/cookies`);
+    getCookies(userId) {
+     //  console.log(`Updating cookie status for UserID: ${userId}`);
+        return axios.get(`${API_URL}/api/cookies`, { params: { userId } })
+            .then(response => response.data) 
+            .catch(error => { throw error; }); 
     },
-    updateCookieStatus(cookieId, blockedStatus) {
-        return axios.patch(`${API_URL}/api/cookies/block/${cookieId}`, { blockedStatus });
+    updateCookieStatus(cookieId, blockedStatus, userId) {
+        console.log(`Sending request to update status for: Cookie ID: ${cookieId}, User ID: ${userId}`);
+        return axios.patch(`${API_URL}/api/cookies/block/${cookieId}`, {
+            blockedStatus,
+            userId
+        }).then(response => {
+            return response.data;
+        }).catch(error => {
+            throw error;
+        });
+        
     }
 }
 
-export default {API_URL, ...api};
+export default api;
+

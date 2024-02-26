@@ -9,9 +9,9 @@
         </b-navbar-nav>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item href="#" @click.prevent="showCharts = !showCharts">Analytics</b-nav-item>
+      <b-nav-item href="#" @click.prevent="toggleCharts">Analytics</b-nav-item>
       <b-nav-form>
-        <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search or Filter by Domain"></b-form-input>
+        <b-form-input size="sm" class="mr-sm-2" v-model="filterDomain" placeholder="Search Website"></b-form-input>
       </b-nav-form>
     </b-navbar-nav>
   </b-collapse>
@@ -25,7 +25,7 @@
 
 
     <!-- Charts Section-->
-    <div v-if="showCharts" class="chart-container">
+    <div v-if="showCharts " class="chart-container">
       <doughnut-chart :chart-data="doughnutChartData"></doughnut-chart>
       <horizontal-bar-chart :chart-data="horizontalBarChartData"></horizontal-bar-chart>
       <bar-chart :chart-data="barChartData"></bar-chart>
@@ -36,7 +36,7 @@
     <div class="list-container">
       <b-list-group>
         <cookie-category
-          v-for="(cookies, category) in categorisedCookies"
+          v-for="(cookies, category) in filteredCookies"
           :key="category"
           :category-name="category"
           :cookies="cookies"
@@ -51,7 +51,8 @@
 
 
 <script>
-import { cookieMixin } from '../mixin/cookieMix';
+import { computed } from 'vue';
+import {useStore} from 'vuex';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
 import axios from 'axios';
@@ -59,16 +60,25 @@ import DoughnutChart from './charts/DoughnutChart.vue';
 import HorizontalBarChart from './charts/HorizontalBChart.vue';
 import BarChart from './charts/BarChart.vue';
 import {cookieDescriptions} from './cookieDescriptions';
+import { cookieUtil } from '../mixin/cookieUtil';
+import { mapGetters } from 'vuex';
+
 
 
 export default {
   name: 'CookieKey',
-  mixins: [cookieMixin],
   components: {
     CookieCategory,
     DoughnutChart,
     HorizontalBarChart,
     BarChart
+  },
+  setup(){
+    const store = useStore();
+    const vuexCookies = computed(() => store.state.vuexCookies);
+    return{
+      vuexCookies
+    };
   },
   data() {
     return {
@@ -89,6 +99,23 @@ export default {
     };
   },
   methods: {
+  toggleCharts() {
+    this.showCharts = !this.showCharts;
+        console.log('Toggling showCharts:', this.showCharts); 
+  },
+    async fetchAllCookies(){
+      try{
+        await this.$store.dispatch('fetchCookies');
+        const fetchedCookies = this.vuexCookie.cookies; 
+        if (Array.isArray(fetchedCookies)) {
+      this.handleCookiesReceived(fetchedCookies);
+    } else {
+      console.error('Fetched cookies is not an array:', fetchedCookies);
+    }
+  } catch (error) {
+    console.error('Error when fetching cookies from the frontend:', error);
+  }
+    },
     toggleKeySection(){
       this.showKey =!this.showKey;
     },
@@ -101,27 +128,33 @@ export default {
       return false;
     },
     handleCookiesReceived(newCookies) {
-      newCookies.forEach(cookie => {
-        const formattedCookie = {
-          ...cookie,
-          expirationDate: this.formatExpirationDate(cookie.expirationDate)
-        };
+      if (Array.isArray(newCookies)) {
 
-        const cookieId = `${cookie.domain}-${cookie.name}`; 
-        this.allCookies[cookieId] = formattedCookie;
-      });
-
-      this.cookies = Object.values(this.allCookies);
-    },
+    newCookies.forEach(cookie => {
+      const formattedCookie = {
+        ...cookie,
+        expirationDate: formatExpirationDate(cookie.expirationDate)
+      };
+      const cookieId = `${cookie.domain}-${cookie.name}`; 
+      this.allCookies[cookieId] = formattedCookie;
+    });
+    this.cookies = Object.values(this.allCookies); 
+  } else {
+    console.error('newCookies is not an array:', newCookies);
+  }
+},
     formatExpirationDate,
-    async handleBlockStatusUpdate(updatedCookie) {
-      try {
-        await axios.patch(`http://localhost:3000/api/cookies/block/${updatedCookie._id}`, {
-          blockedStatus: !updatedCookie.blockedStatus
+    async handleBlockStatusUpdate(cookie) {
+       const userId = this.$store.state.userId;
+
+        if (!userId) {
+            return;
+        }
+        this.$store.dispatch('blockUnblockCookie', {
+            cookieId: cookie._id,
+            blockedStatus: !cookie.blockedStatus,
+            userId: userId
         });
-      } catch (error) {
-        console.error('Error updating cookie status:', error);
-      }
     },
     async getAllCookies() {
       if (this.shouldSendUpdate()) {
@@ -150,11 +183,34 @@ export default {
     },
   },
   computed: {
-    barChartData() {
+        horizontalBarChartData() {
+    let blockedCount = 0;
+    let unblockedCount = 0;
+
+    Object.values(this.categorizedCookies).flat().forEach(cookie => {
+      if (cookie.blockedStatus) {
+        blockedCount++;
+      } else {
+        unblockedCount++;
+      }
+    });
+    return {
+      labels: ['Blocked', 'Unblocked'],
+      datasets: [{
+        label: 'Cookies',
+        data: [blockedCount, unblockedCount],
+        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
+        borderWidth: 1
+      }]
+    };
+  },
+        barChartData() {
     let domainCounts = {};
-    this.cookies.forEach(cookie => {
+Object.values(this.categorizedCookies).flat().forEach(cookie => {
       domainCounts[cookie.domain] = (domainCounts[cookie.domain] || 0) + 1;
     });
+
 
     return {
       labels: Object.keys(domainCounts),
@@ -167,68 +223,84 @@ export default {
       }]
     };
   },
-    horizontalBarChartData() {
-    let blockedCount = 0;
-    let unblockedCount = 0;
+    categorizedCookies(){
+      return this.$store.state.cookies;
+    },
+    vuexCookie(){
+      return this.$store.state.cookies;
+    },
+    userId(){
+      return this.$store.state.userId;
+    },
+        allFromCookies(){
+      return this.$store.state.cookies;
+    }, 
+            ...mapGetters(['categorizedCookies', 'chartData']),
 
-    this.cookies.forEach(cookie => {
-      if (cookie.blockedStatus) {
-        blockedCount++;
-      } else {
-        unblockedCount++;
-      }
-    });
-
-    return {
-      labels: ['Blocked', 'Unblocked'],
-      datasets: [{
-        label: 'Cookies',
-        data: [blockedCount, unblockedCount],
-        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(75, 192, 192, 0.2)'],
-        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
-        borderWidth: 1
-      }]
-    };
-  },
-    doughnutChartData() {
-    let categoryCounts = {};
-    this.cookies.forEach(cookie => {
-      let category = this.categorisedCookie(cookie);
-      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-    });
-
-    return {
-      labels: Object.keys(categoryCounts),
-      datasets: [{
-        data: Object.values(categoryCounts),
-        backgroundColor: Object.keys(categoryCounts).map(category => this.getColourForCategory(category))
-      }]
-    };
+ doughnutChartData() {
+    const chartData = this.chartData;
+        return {
+            labels: chartData.map(data => data.category),
+            datasets: [{
+                data: chartData.map(data => data.count),
+                backgroundColor: chartData.map(data => cookieUtil.getColourForCategory(data.category)),
+                hoverOffset: 4
+            }]
+        };
   },
     filteredCookies() {
-      if (!this.filterDomain) {
-        return this.cookies;
+      if (!this.filterDomain.trim()) {
+      return this.allFromCookies;
+    }
+    let filtered = {};
+    Object.entries(this.allFromCookies).forEach(([category, cookies]) => {
+      let filteredCookies = cookies.filter(cookie => cookie.domain.toLowerCase().includes(this.filterDomain.toLowerCase()));
+      if (filteredCookies.length > 0) {
+        filtered[category] = filteredCookies;
       }
-      return this.cookies.filter(cookie => cookie.domain && cookie.domain.includes(this.filterDomain.toLowerCase()));
+    });
+    return filtered;
     },
     formattedCookies() {
       return this.cookies.map(cookie => ({
         ...cookie,
-        expirationDate: this.formatExpirationDate(cookie.expirationDate),
+        expirationDate: formatExpirationDate(cookie.expirationDate),
         type: this.categorisedCookie(cookie)
       }));
     },
   },
+  watch: {
+    userId(newUserId, oldUserId) {
+    if (newUserId !== oldUserId) {
+      this.fetchAllCookies();
+    }
+  },
+  vuexCookie(newVal) {
+          console.log('vuexCookies updated', newVal);
+          this.handleCookiesReceived(newVal);
+        }
+    
+  },
   mounted() {
-    this.getAllCookies();
+    this.$nextTick(() => {
+    const fetchedCookies = this.vuexCookies; 
+    console.log('Fetched cookies for processing:', fetchedCookies);
+    if (fetchedCookies && fetchedCookies.length > 0) {
+        this.handleCookiesReceived(fetchedCookies);
+    }
+});
+    this.$store.dispatch('fetchUserId');
+    this.$store.dispatch('fetchCookies');
     this.getCurrentDomain().then(domain => {
       this.currentDomain = domain;
       console.log("Current Domain: ", this.currentDomain);
     }).catch(error => {
       console.error('Error', error);
     });
+
   },
   created() {
+      this.fetchAllCookies();
     window.addEventListener("message", (event) => {
       if (event.source === window && event.data && event.data.type === "FROM_EXTENSION") {
         if (event.data.action === "displayCookies") {
