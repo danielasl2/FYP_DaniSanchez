@@ -4,7 +4,7 @@
     "description": " This is an extension for managing cookies",
     "manifest_version": 3,
     "content_security_policy":{
-     "extension_page": "script-src 'self' http://localhost:3000; object-src 'self';"
+     "extension_page": "script-src 'self' https://fyp-danisanchez.onrender.com; object-src 'self';"
     },
     "icons":{
         "16": "icons/16x16.png",
