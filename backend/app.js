@@ -4,7 +4,7 @@ const cookieRoutes = require('./routes/cookieRoute');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const MONGODB_URI = "mongodb+srv://danielasl20:Colombia20@cluster0.isdd3bt.mongodb.net/?retryWrites=true&w=majority";
+const MONGODB_URI = "mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.isdd3bt.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority";
 
 const app = express();
 const bodyParser = require('body-parser');
@@ -36,4 +36,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
 
