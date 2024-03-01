@@ -36,7 +36,7 @@ function sendCookiesToServer(cookies) {
       });
 
       if (newOrUpdatedCookies.length > 0) {
-          fetch(`http://localhost:3000/api/cookies`, {
+          fetch(`http://fyp-danisanchez.onrender.com/api/cookies`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ cookies: newOrUpdatedCookies })
