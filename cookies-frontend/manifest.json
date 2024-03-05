@@ -1,6 +1,6 @@
 {
     "name": "Cookies Dashboard",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": " This is an extension for managing cookies",
     "manifest_version": 3,
     "content_security_policy":{
