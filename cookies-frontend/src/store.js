@@ -2,7 +2,7 @@ import { createStore } from 'vuex';
 import api from './api';
 import { cookieUtil} from './mixin/cookieUtil';
 
-//formating date here since changed the categorisation method
+//formating date here since changed the categorisation method now the date is not reading from the utils
 function formatCookieDate(dateString){
   if(!dateString|| dateString === 'N/A') return 'N/A';
 
@@ -24,15 +24,14 @@ const year = date.getFullYear();
 return `${day}/${month}/${year}`;
 }
 
-// here is the main vuex
 const store = createStore({
     state: {
         cookies: {},
         userId: null,
     },
-    // mutations are uses to updates the state of the cookies by category and user id
     mutations: {
         UPDATE_COOKIE_STATUS(state, { category, updatedCookie }) {
+
             if (state.cookies[category]) {
                 const index = state.cookies[category].findIndex(cookie => cookie._id === updatedCookie._id);
                 if (index !== -1) {
@@ -40,7 +39,18 @@ const store = createStore({
                 }
             }
         },
-        SET_COOKIES(state, categorizedCookies) {
+        SET_COOKIES(state, rawCookies) {
+            const categorizedCookies = {};
+            rawCookies.forEach(cookie => {
+                const category = cookieUtil.categorisedCookie(cookie);
+                if (!categorizedCookies[category]) {
+                    categorizedCookies[category] = [];
+                }
+                categorizedCookies[category].push({
+                    ...cookie,
+                    expirationDate: formatCookieDate(cookie.expirationDate)
+                });
+            });
             state.cookies = categorizedCookies;
         },
     
@@ -49,14 +59,10 @@ const store = createStore({
       },
     },
     actions: {
-        // to ensure that the google chrome extension is being fill with data
-        async initialiseStore({ dispatch }) {
-            await dispatch('fetchUserId');
-            await dispatch('fetchCookies');
-        },
-        async fetchCookies({commit, state}) {
+        async fetchCookies({commit}) {
+            let userId = null; 
+
             try {
-                /*
                 if (chrome && chrome.storage) {
                     userId = await new Promise((resolve, reject) => {
                         chrome.storage.local.get(['userId'], (result) => {
@@ -68,8 +74,8 @@ const store = createStore({
                         });
                     });
                 }
-                */
-                const rawCookies = await api.getCookies(state.userId);
+    
+                const rawCookies = await api.getCookies(userId);
                 const categorizedCookies = rawCookies.map(cookie => ({
                   ...cookie,
                   category: cookieUtil.categorisedCookie(cookie),
@@ -82,10 +88,10 @@ const store = createStore({
                 console.error('Error fetching cookies:', error);
             }
         },
-        async blockUnblockCookie({ commit, state }, { cookieId, blockedStatus}) {
-           // console.log(`Attempting to update: Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
+        async blockUnblockCookie({ commit }, { cookieId, blockedStatus, userId }) {
+            console.log(`Attempting to update: Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
             try {
-              const response = await api.updateCookieStatus(cookieId, blockedStatus, state.userId);
+              const response = await api.updateCookieStatus(cookieId, blockedStatus, userId);
               commit('UPDATE_COOKIE_STATUS', response.data);
             } catch (error) {
               console.error('Error blocking/unblocking cookie:', error);
@@ -93,7 +99,7 @@ const store = createStore({
           },
           fetchUserId({commit}){
             return new Promise((resolve, reject) => {
-          //  if (chrome && chrome.storage){
+            if (chrome && chrome.storage){
               chrome.storage.local.get( ['userId'], (result) => {
                 if (result.userId) {
                   commit('SET_USER_ID', result.userId);
@@ -101,13 +107,10 @@ const store = createStore({
                 } else {
                   reject('No user ID found');
               }
-              /*
               });
             } else {
               reject('Chrome storage is not accessible');
             }
-            */
-        });
           });
         }
     },
@@ -127,6 +130,22 @@ const store = createStore({
           console.error('Error toggling cookie status:', error);
       }
   },
+          fetchUserID({commit}) {
+            return new Promise((resolve, reject) => {
+                if (chrome && chrome.storage) {
+                    chrome.storage.local.get(['userId'], (result) => {
+                        if (result.userId) {
+                            commit('SET_USER_ID', result.userId);
+                            resolve(result.userId);
+                        } else {
+                            reject('No user ID found');
+                        }
+                    });
+                } else {
+                    reject('Chrome storage is not accessible');
+                }
+            });
+        },
     getters: {
         chartData: (state) => {
             return Object.keys(state.cookies).map( category => ({

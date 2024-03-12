@@ -1,5 +1,4 @@
-
-chrome.runtime.onMessage.addListener((message, sender) => {
+chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "displayCookies") {
     console.log("Received cookies in content script:", message.data.cookies); 
 
@@ -31,6 +30,5 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 });
 
-// to notify background that content is ready and loaded
-chrome.runtime.sendMessage({ action: "contentScriptReady", data: {necessaryData} });
+chrome.runtime.sendMessage({ action: "contentScriptReady" });
 
