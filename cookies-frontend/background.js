@@ -21,7 +21,6 @@ function sendCookiesToServer(cookies) {
       const formattedCookies = cookies.map(cookie => ({
           ...cookie,
           userId,
-          expirationDate: cookie.expirationDate ? new Date(cookie.expirationDate * 1000).toISOString() : undefined,
           secure: cookie.secure || false,
           session: cookie.session || false
       }));
