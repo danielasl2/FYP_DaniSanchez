@@ -2,7 +2,7 @@ import { createStore } from 'vuex';
 import api from './api';
 import { cookieUtil} from './mixin/cookieUtil';
 
-//formating date here since changed the categorisation method now the date is not reading from the utils
+//formating date here since changed the categorisation method
 function formatCookieDate(dateString){
   if(!dateString|| dateString === 'N/A') return 'N/A';
 
@@ -59,40 +59,30 @@ const store = createStore({
       },
     },
     actions: {
-        async fetchCookies({commit}) {
-            let userId = null; 
-
+        async initializeStore({ dispatch }) {
+            await dispatch('fetchUserId');
+            await dispatch('fetchCookies');
+        },
+        async fetchCookies({commit, state}) {
             try {
-                if (chrome && chrome.storage) {
-                    userId = await new Promise((resolve, reject) => {
-                        chrome.storage.local.get(['userId'], (result) => {
-                            if (result.userId) {
-                                resolve(result.userId);
-                            } else {
-                                reject('No user ID found');
-                            }
-                        });
-                    });
-                }
-    
-                const rawCookies = await api.getCookies(userId);
+                const rawCookies = await api.getCookies(state.userId);
                 const categorizedCookies = rawCookies.map(cookie => ({
                   ...cookie,
                   category: cookieUtil.categorisedCookie(cookie),
                   expirationDate: formatCookieDate(cookie.expirationDate),
                 }));
         
-                console.log("Processed cookie for vuex:", categorizedCookies);
+             //   console.log("Processed cookie for vuex:", categorizedCookies);
                 commit('SET_COOKIES', categorizedCookies);
             } catch (error) {
                 console.error('Error fetching cookies:', error);
             }
         },
-        async blockUnblockCookie({ commit }, { cookieId, blockedStatus, userId }) {
-            console.log(`Attempting to update: Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
+        async blockUnblockCookie({ commit}, { cookieId, blockedStatus, userId }) {
+            //console.log(`Attempting to update: Cookie ID: ${cookieId}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);
             try {
               const response = await api.updateCookieStatus(cookieId, blockedStatus, userId);
-              commit('UPDATE_COOKIE_STATUS', response.data);
+              commit('UPDATE_COOKIE_STATUS', { category: response.category, updatedCookie: response.data });
             } catch (error) {
               console.error('Error blocking/unblocking cookie:', error);
             }
@@ -114,38 +104,6 @@ const store = createStore({
           });
         }
     },
-    async toggleBlockStatus({ dispatch, state }, cookie) {
-      try {
-          const userId = state.userId; 
-          if (!userId) {
-              console.error('No user ID found for blocking/unblocking cookies');
-              return;
-          }
-          await dispatch('blockUnblockCookie', {
-              cookieId: cookie._id,
-              blockedStatus: !cookie.blockedStatus, 
-              userId: userId
-          });
-      } catch (error) {
-          console.error('Error toggling cookie status:', error);
-      }
-  },
-          fetchUserID({commit}) {
-            return new Promise((resolve, reject) => {
-                if (chrome && chrome.storage) {
-                    chrome.storage.local.get(['userId'], (result) => {
-                        if (result.userId) {
-                            commit('SET_USER_ID', result.userId);
-                            resolve(result.userId);
-                        } else {
-                            reject('No user ID found');
-                        }
-                    });
-                } else {
-                    reject('Chrome storage is not accessible');
-                }
-            });
-        },
     getters: {
         chartData: (state) => {
             return Object.keys(state.cookies).map( category => ({
