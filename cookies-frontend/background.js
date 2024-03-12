@@ -2,10 +2,20 @@ let sentCookies = {};
 
 //Enabling the extension to be able to identify specific users
 
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
+function getOrGenerateUUID(callback) {
+  chrome.storage.local.get("userId", (data) => {
+    let userId = data.userId;
+    if (!userId) {
+      userId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      chrome.storage.local.set({userId: userId}, () => {
+        callback(userId);
+      });
+    } else {
+      callback(userId);
+    }
   });
 }
 
