@@ -7,8 +7,6 @@ router.patch('/block/:id', async (req, res) => {
     const { id } = req.params;
     const { blockedStatus, userId } = req.body;
 
-  //  console.log(`Backend received: Cookie ID: ${id}, Blocked Status: ${blockedStatus}, User ID: ${userId}`);  
-
     try {
         const cookie = await Cookie.findOne({ _id: id, userId });
         if (!cookie) {

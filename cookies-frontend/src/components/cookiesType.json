@@ -1,0 +1,49 @@
+[
+    {
+      "cookie_names": ["sess", "csrftoken"],
+      "cookie_type": "Necessary Cookies"
+    },
+    {
+      "cookie_names": ["track"],
+      "cookie_domains": ["track"],
+      "cookie_type": "Tracking Cookies"
+    },
+    {
+      "cookie_names": ["ad"],
+      "cookie_domains": ["ad"],
+      "cookie_type": "Advertising Cookies"
+    },
+    {
+      "cookie_names": ["ui", "pref"],
+      "cookie_type": "UI and Preferences"
+    },
+    {
+      "cookie_names": ["analytics"],
+      "cookie_domains": ["analytics"],
+      "cookie_type": "Performance and Analytics Cookies"
+    },
+    {
+      "cookie_domains": ["instagram.com", "facebook.com", "twitter.com"],
+      "cookie_type": "Social Media Cookies"
+    },
+    {
+      "session": true,
+      "cookie_type": "Session Cookies"
+    },
+    {
+      "cookie_names": ["lang", "region"],
+      "cookie_type": "Customization Cookies"
+    },
+    {
+      "persistent": true,
+      "cookie_type": "Persistent Cookies"
+    },
+    {
+      "secure": true,
+      "cookie_type": "Secure Cookies"
+    },
+    {
+      "cookie_type": "Other Cookies" 
+    }
+  ]
+  
