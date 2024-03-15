@@ -226,9 +226,10 @@ Object.values(this.categorizedCookies).flat().forEach(cookie => {
     vuexCookie(){
       return this.$store.state.cookies;
     },
+    /*
     userId(){
       return this.$store.state.userId;
-    },
+    }, */
         allFromCookies(){
       return this.$store.state.cookies;
     }, 

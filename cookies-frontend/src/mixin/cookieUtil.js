@@ -1,19 +1,12 @@
-import axios from 'axios';
+import cookiesType from '../components/cookiesType.json';
+
 
 export const cookieUtil =  {
-  cookiesType: [],
-
-  async loadCookiesType() {
-    try {
-      const response = await axios.get('../components/cookiesType.json'); 
-      this.cookiesType = response.data;
-      console.log('This is the data', response);
-    } catch (error) {
-      console.error('Error loading cookie configuration:', error);
-    }
-  },
     categorisedCookie(cookie) {
-      for (const category of this.cookiesType) {
+      for (const category of cookiesType) {
+        if (category.secure && cookie.secure) {
+          return category.cookie_type;
+        }
         // Based on cookie names
         if (category.cookie_names) {
           for (const name of category.cookie_names) {
@@ -30,7 +23,7 @@ export const cookieUtil =  {
             }
           }
         }
-        // Session and persistent cookies
+        // Session, persistent and secure cookies
         if (category.session && cookie.session) {
           return category.cookie_type;
         }

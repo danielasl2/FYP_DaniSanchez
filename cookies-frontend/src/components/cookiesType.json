@@ -39,6 +39,10 @@
       "cookie_type": "Persistent Cookies"
     },
     {
+      "secure": true,
+      "cookie_type": "Secure Cookies"
+    },
+    {
       "cookie_type": "Other Cookies" 
     }
   ]
