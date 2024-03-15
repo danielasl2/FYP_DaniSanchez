@@ -59,6 +59,10 @@ const store = createStore({
       },
     },
     actions: {
+        async loadCookiesTypes( {dispatch}){
+            await cookieUtil.loadCookiesType();
+            await dispatch ('fetchCookies');
+        },
         async fetchCookies({commit}) {
             let userId = null; 
 
@@ -130,22 +134,6 @@ const store = createStore({
           console.error('Error toggling cookie status:', error);
       }
   },
-          fetchUserID({commit}) {
-            return new Promise((resolve, reject) => {
-                if (chrome && chrome.storage) {
-                    chrome.storage.local.get(['userId'], (result) => {
-                        if (result.userId) {
-                            commit('SET_USER_ID', result.userId);
-                            resolve(result.userId);
-                        } else {
-                            reject('No user ID found');
-                        }
-                    });
-                } else {
-                    reject('Chrome storage is not accessible');
-                }
-            });
-        },
     getters: {
         chartData: (state) => {
             return Object.keys(state.cookies).map( category => ({
