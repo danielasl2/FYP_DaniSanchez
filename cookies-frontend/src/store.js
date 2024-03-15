@@ -72,7 +72,6 @@ const store = createStore({
                   expirationDate: formatCookieDate(cookie.expirationDate),
                 }));
         
-             //   console.log("Processed cookie for vuex:", categorizedCookies);
                 commit('SET_COOKIES', categorizedCookies);
             } catch (error) {
                 console.error('Error fetching cookies:', error);
