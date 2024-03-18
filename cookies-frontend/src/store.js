@@ -136,7 +136,7 @@ const store = createStore({
   },
     getters: {
         chartData: (state) => {
-            return Object.keys(state.cookies).map( category => ({
+            return Object.keys(state.cookies).map(category => ({
                 category: category,
                 count: state.cookies[category].length
             })
