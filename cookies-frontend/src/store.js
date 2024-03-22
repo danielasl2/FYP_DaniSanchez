@@ -59,10 +59,6 @@ const store = createStore({
       },
     },
     actions: {
-        async loadCookiesTypes( {dispatch}){
-            await cookieUtil.loadCookiesType();
-            await dispatch ('fetchCookies');
-        },
         async fetchCookies({commit}) {
             let userId = null; 
 
