@@ -51,7 +51,7 @@
 
 
 <script>
-import { computed} from 'vue';
+import { computed } from 'vue';
 import {useStore} from 'vuex';
 import CookieCategory from './CookiesCategory.vue';
 import { formatExpirationDate } from '../reuse/utils';
@@ -75,19 +75,18 @@ export default {
   },
   setup(){
     const store = useStore();
-    const categorisedCookies = computed(() => store.state.cookies);
-    const userId = computed(() => store.state.userId);
-    
+    const vuexCookies = computed(() => store.state.vuexCookies);
     return{
-      categorisedCookies,
-      userId,
+      vuexCookies
     };
   },
   data() {
     return {
       showKey: false,
       cookieDescriptions,
-      showCharts: false,
+      showCharts:false,
+      lastUpdateTimestamp: 0,
+      updateInterval: 100,
       allCookies: {},
       cookies: [],
       currentDomain: null,
@@ -226,10 +225,9 @@ Object.values(this.categorizedCookies).flat().forEach(cookie => {
     vuexCookie(){
       return this.$store.state.cookies;
     },
-    /*
     userId(){
       return this.$store.state.userId;
-    }, */
+    },
         allFromCookies(){
       return this.$store.state.cookies;
     }, 
@@ -280,16 +278,22 @@ Object.values(this.categorizedCookies).flat().forEach(cookie => {
     
   },
   mounted() {
-    this.$nextTick(async () => {
-      await this.$store.dispatch('loadCookiesTypes');
-      await this.getCurrentDomain().then(domain => {
-        this.currentDomain = domain;
-      }).catch(error => {
-        console.error('Error', error);
-      });
-      await this.$store.dispatch('fetchCookies');
-      this.$store.dispatch('fetchUserId');
+    this.$nextTick(() => {
+    const fetchedCookies = this.vuexCookies; 
+    console.log('Fetched cookies for processing:', fetchedCookies);
+    if (fetchedCookies && fetchedCookies.length > 0) {
+        this.handleCookiesReceived(fetchedCookies);
+    }
+});
+    this.$store.dispatch('fetchUserId');
+    this.$store.dispatch('fetchCookies');
+    this.getCurrentDomain().then(domain => {
+      this.currentDomain = domain;
+      console.log("Current Domain: ", this.currentDomain);
+    }).catch(error => {
+      console.error('Error', error);
     });
+
   },
   created() {
       this.fetchAllCookies();
